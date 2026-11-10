@@ -16,6 +16,7 @@ use App\Services\PageDuplicationService;
 use App\Services\PageService;
 use App\Support\Staff;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 
 /**
@@ -53,19 +54,37 @@ class PageController extends Controller
 		]);
 	}
 
-	public function store(StorePageRequest $request, Project $project): RedirectResponse
+	/**
+	 * Zapis bez czekania na Figmę: frame i podglądy pobiera w tle kolejka na liście podstron
+	 * (FigmaQueueController), więc można od razu dodawać kolejne podstrony. Z JS odpowiedź jest w JSON.
+	 */
+	public function store(StorePageRequest $request, Project $project): RedirectResponse|JsonResponse
 	{
 		try {
 			$page = $this->pages->create($project, $request->pageData(), Staff::current());
 		} catch (PageStructureException $e) {
+			if ($request->expectsJson()) {
+				return response()->json(['message' => $e->getMessage(), 'errors' => [$e->field => [$e->getMessage()]]], 422);
+			}
+
 			return back()->withInput()->withErrors([$e->field => $e->getMessage()]);
 		}
 
-		return $this->withFrame(
-			redirect()->route('fmi.projects.show', $project),
-			$page,
-			'Podstrona „' . $page->name . '” została dodana.',
-		);
+		$queued = $page->figma_frame_url && $this->figma->isConfigured();
+		$message = 'Podstrona „' . $page->name . '” została dodana.' . ($queued ? ' Frame z Figmy pobiera się w tle.' : '');
+
+		if ($request->expectsJson()) {
+			return response()->json([
+				'id' => $page->id,
+				'name' => $page->name,
+				'message' => $message,
+				'queued' => $queued,
+				'fetch_url' => $queued ? route('fmi.projects.pages.figma.queue.fetch', [$project, $page]) : null,
+				'edit_url' => route('fmi.projects.pages.edit', [$project, $page]),
+			], 201);
+		}
+
+		return redirect()->route('fmi.projects.show', $project)->with('status', $message);
 	}
 
 	public function update(UpdatePageRequest $request, Project $project, Page $page): RedirectResponse

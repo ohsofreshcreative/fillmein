@@ -126,8 +126,9 @@ return [
 		'cache_ttl_minutes' => 60,
 
 		// Głębokość drzewa poniżej frame'u i twardy limit liczby warstw zapisywanych w cache.
-		'node_depth' => 8,
-		'max_nodes' => 5000,
+		// 8 poziomów ucinało pola w głęboko zagnieżdżonych makietach (formularze, menu, tabele w kartach).
+		'node_depth' => 16,
+		'max_nodes' => 10000,
 
 		// Typy warstw, które mogą być frame'em podstrony (CANVAS = strona pliku, DOCUMENT = cały plik).
 		'frame_types' => ['FRAME', 'SECTION', 'COMPONENT', 'COMPONENT_SET', 'INSTANCE', 'GROUP'],
@@ -179,6 +180,16 @@ return [
 			// Minimalna liczba powtórzeń o tej samej strukturze, aby zaproponować repeater
 			// (karty) oraz liczba sąsiednich warstw tekstowych o tej samej nazwie (punkty listy).
 			'min_repeat_items' => 2,
+
+			// Duży frame (wysokość ≥ max(split_min_height, split_min_height_ratio × szerokość frame'u podstrony))
+			// z co najmniej dwoma blokami z tekstem na pełną szerokość (≥ split_full_width_ratio szerokości frame'u,
+			// wysokość ≥ split_child_min_height) albo z jednym takim dużym blokiem rozbijamy na sekcje-dzieci.
+			'split_large_frames' => true,
+			'split_min_height' => 1200,
+			'split_min_height_ratio' => 0.75,
+			'split_child_min_height' => 300,
+			'split_full_width_ratio' => 0.9,
+			'split_max_levels' => 3,
 			'min_text_run' => 3,
 			'icon_max_size' => 96,
 		],

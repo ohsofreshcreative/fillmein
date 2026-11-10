@@ -35,7 +35,10 @@ class SiteMappingController extends Controller
 
 	public function auto(SiteMappingActionRequest $request, Project $project): RedirectResponse
 	{
-		abort_unless($this->site->schema($project), 404);
+		if (! $this->site->schema($project)) {
+			return redirect()->route('fmi.projects.mapping', $project)->withErrors(['schema' => 'Najpierw wgraj schemat strony.']);
+		}
+
 		$this->site->autoMatch($project, Staff::current());
 
 		return redirect()

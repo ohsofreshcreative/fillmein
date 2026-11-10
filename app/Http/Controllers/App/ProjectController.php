@@ -13,6 +13,8 @@ use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Requests\UpdateProjectStatusRequest;
 use App\Models\Page;
 use App\Models\Project;
+use App\Services\FigmaFrameService;
+use App\Services\FigmaQueueService;
 use App\Services\ProjectAssignmentService;
 use App\Services\ProjectService;
 use App\Services\SiteMappingService;
@@ -41,6 +43,8 @@ class ProjectController extends Controller
 	public function __construct(
 		private ProjectService $projects,
 		private ProjectAssignmentService $assignments,
+		private FigmaFrameService $figma,
+		private FigmaQueueService $figmaQueue,
 	) {
 	}
 
@@ -126,9 +130,24 @@ class ProjectController extends Controller
 			->orderBy('id')
 			->get();
 
+		$active = $pages->reject(fn (Page $page) => $page->isArchived());
+		$figmaReady = $project->usesModule(ProjectModule::Content) && $this->figma->isConfigured();
+		$canFetch = $figmaReady && Gate::allows('managePages', $project);
+		$canImport = $figmaReady && Gate::allows('configureFields', $project);
+
 		return view('fillmein.projects.show', [
 			'project' => $project,
-			'tree' => Page::tree($pages->reject(fn (Page $page) => $page->isArchived())),
+			'tree' => Page::tree($active),
+			// Kolejka Figmy w tle (FigmaQueueController): adresy zadań dla podstron z linkiem do frame'u.
+			'figmaQueue' => [
+				'pending' => $canFetch ? $this->figmaQueue->pending($project, $active) : [],
+				'urls' => $active->filter(fn (Page $page) => $page->figma_frame_url && ($canFetch || $canImport))->mapWithKeys(fn (Page $page) => [$page->id => array_filter([
+					'fetch' => $canFetch ? route('fmi.projects.pages.figma.queue.fetch', [$project, $page]) : null,
+					'import' => $canImport ? route('fmi.projects.pages.figma.queue.import', [$project, $page]) : null,
+				])])->all(),
+				'storeUrl' => route('fmi.projects.pages.store', $project),
+				'canImport' => $canImport,
+			],
 			'archivedPages' => $pages->filter(fn (Page $page) => $page->isArchived())->values(),
 			'pageOptions' => $this->pageOptions($pages),
 			'progress' => ProjectProgress::forProjectIds([$project->id])[$project->id],

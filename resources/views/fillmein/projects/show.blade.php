@@ -54,6 +54,7 @@
           </div>
         </x-ui.card>
 
+        <div x-data="figmaQueue(@js(\Illuminate\Support\Arr::only($figmaQueue, ['pending', 'urls', 'storeUrl'])))" data-figma-queue>
         <x-ui.card>
           <x-slot:header>
             <div>
@@ -61,6 +62,26 @@
               <p class="mt-0.5 text-sm text-ink-500">Każda podstrona ma własny link do jednego frame'u Figmy.</p>
             </div>
           </x-slot:header>
+
+          {{-- Postęp kolejki Figmy (pobieranie frame'ów w tle, masowa analiza i import). --}}
+          <div x-show="total > 0" x-cloak class="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-ink-50 px-4 py-3 text-sm" role="status" aria-live="polite" data-figma-queue-progress>
+            <span class="inline-flex items-center gap-2 text-ink-800">
+              <span x-show="busy"><x-ui.spinner size="sm" label="Przetwarzanie Figmy" /></span>
+              <span x-text="busy ? `Figma: przetworzono ${finished} z ${total} — możesz dalej pracować na tej stronie.` : `Figma: gotowe (${finished} z ${total}).`"></span>
+            </span>
+            <x-ui.button x-show="!busy" type="button" variant="secondary" size="sm" x-on:click="window.location.reload()">Odśwież listę</x-ui.button>
+          </div>
+
+          @if ($figmaQueue['canImport'] && $figmaQueue['urls'] !== [])
+            <div class="mb-4 flex flex-wrap items-center gap-2" data-figma-bulk>
+              <x-ui.button type="button" size="sm" x-bind:disabled="selected.length === 0" x-on:click="importSelected()" data-figma-bulk-import>
+                Analiza i import pól (<span x-text="selected.length">0</span>)
+              </x-ui.button>
+              <x-ui.button type="button" variant="ghost" size="sm" x-on:click="selectAll()">Zaznacz wszystkie z Figmą</x-ui.button>
+              <x-ui.button type="button" variant="ghost" size="sm" x-show="selected.length > 0" x-on:click="selected = []">Odznacz</x-ui.button>
+              <p class="w-full text-sm text-ink-500">Pobiera świeży frame i stosuje zmiany zaznaczane domyślnie w podglądzie importu. Zmiany z treścią klienta albo ręczną konfiguracją zostają do decyzji w „Analiza i import pól” na podstronie.</p>
+            </div>
+          @endif
 
           @if ($tree === [])
             <x-ui.empty-state
@@ -73,15 +94,30 @@
               'project' => $project,
               'depth' => 0,
               'canManage' => $can['managePages'],
+              'queueUrls' => $figmaQueue['urls'],
+              'canImport' => $figmaQueue['canImport'],
             ])
           @endif
 
           @if ($can['managePages'])
-            <details class="mt-6 rounded-xl border border-ink-150 bg-ink-50 px-4 py-3">
+            <details class="mt-6 rounded-xl border border-ink-150 bg-ink-50 px-4 py-3" @if ($errors->any()) open @endif>
               <summary class="cursor-pointer text-sm font-medium text-ink-800">Dodaj podstronę</summary>
 
-              <form method="POST" action="{{ route('fmi.projects.pages.store', $project) }}" class="mt-4 flex flex-col gap-4" data-loading-form>
+              {{-- Z JS zapis idzie w tle (figmaQueue.addPage) i formularz od razu przyjmuje kolejną podstronę. --}}
+              <ul x-show="added.length > 0" x-cloak class="mt-4 flex flex-col gap-1.5 text-sm" role="list" data-figma-added>
+                <template x-for="page in added" :key="page.id">
+                  <li class="flex flex-wrap items-center gap-2">
+                    <a x-bind:href="page.edit_url" class="font-medium text-ink-950 underline-offset-2 hover:underline" x-text="page.name"></a>
+                    <span class="text-ink-500" x-show="!status[page.id]">dodana</span>
+                    <span x-show="status[page.id]" x-bind:class="{ 'text-success-800': status[page.id]?.state === 'done', 'text-warning-800': status[page.id]?.state === 'warning', 'text-danger-700': status[page.id]?.state === 'error', 'text-ink-500': ['queued', 'running'].includes(status[page.id]?.state) }" x-text="label(page.id)"></span>
+                  </li>
+                </template>
+              </ul>
+
+              <form method="POST" action="{{ route('fmi.projects.pages.store', $project) }}" class="mt-4 flex flex-col gap-4" x-on:submit.prevent="addPage($el)" data-page-add-form>
                 @csrf
+                <p x-show="formErrors.form" x-cloak class="text-sm text-danger-700" x-text="formErrors.form"></p>
+                <p x-show="formMessage && Object.keys(formErrors).length === 0" x-cloak class="text-sm text-success-800" role="status" x-text="formMessage"></p>
                 <x-ui.input name="name" label="Nazwa podstrony" required maxlength="190" />
                 <x-ui.input name="slug" label="Slug" maxlength="190" hint="Opcjonalnie — domyślnie powstaje z nazwy. Musi być unikalny w obrębie podstrony nadrzędnej." />
                 <x-ui.select name="parent_id" label="Podstrona nadrzędna" :options="$pageOptions" placeholder="— poziom główny —" />
@@ -94,8 +130,12 @@
                 />
                 <x-ui.checkbox name="client_can_duplicate" label="Klient może duplikować tę podstronę" />
 
+                <template x-for="(message, key) in formErrors" :key="key">
+                  <p x-show="key !== 'form'" class="text-sm text-danger-700" x-text="message"></p>
+                </template>
+
                 <div class="flex justify-end">
-                  <x-ui.button type="submit">Dodaj podstronę</x-ui.button>
+                  <x-ui.button type="submit" x-bind:disabled="adding" x-bind:aria-busy="adding ? 'true' : 'false'">Dodaj podstronę</x-ui.button>
                 </div>
               </form>
             </details>
@@ -126,6 +166,7 @@
             </details>
           @endif
         </x-ui.card>
+        </div>
 
         @if ($can['manageClientAccess'])
           @include('fillmein.projects.partials.client-access')

@@ -83,7 +83,7 @@ check "Generowanie" 302 "$(post -X POST "$EXPORTS")"
 HTML=$(admin "$EXPORTS")
 has "Komunikat" "$HTML" 'Eksport gotowy'
 has "Historia: status" "$HTML" 'Gotowy'
-has "Historia: wersja" "$HTML" 'wersja 1.1'
+has "Historia: wersja" "$HTML" 'wersja 1.2'
 has "Raport: niezmapowane" "$HTML" 'Niezmapowane: 1'
 has "Raport: miejsce braku" "$HTML" 'Główna sekcja'
 hasntf "Bez tokenu w widoku" "$HTML" "$TOKEN"
@@ -113,7 +113,7 @@ hasntf "Bez tokenu klienta" "$BODY" "$TOKEN"
 hasnt "Bez e-maili" "$BODY" '[A-Za-z0-9._%+-]\+@[A-Za-z0-9.-]\+'
 hasnt "Bez ścieżki /Users/" "$BODY" '/Users/'
 hasnt "Bez haseł" "$BODY" 'password\|user_pass\|hasło'
-has "Wersja" "$BODY" '"schema_version": "1.1"'
+has "Wersja" "$BODY" '"schema_version": "1.2"'
 has "Nadpisanie w pliku" "$BODY" '"name": "header"'
 ZIP=$(php -r '$z=new ZipArchive; $z->open($argv[1]); $n=[]; for($i=0;$i<$z->numFiles;$i++){$name=$z->getNameIndex($i); $n[]=$name; if(str_starts_with($name,"media/")){$sha=substr(basename($name),0,64); if(hash("sha256",$z->getFromIndex($i))!==$sha){echo "SHA_MISMATCH ";}}} echo count($n)," ",in_array("export.json",$n)?"json":"nojson"," ",$z->getFromName("export.json")===file_get_contents($argv[2])?"same":"diff";' /tmp/fmi-stage11-export.zip /tmp/fmi-stage11-export.json)
 check "ZIP: content.json, export.json i pliki z poprawnymi sumami" "6 json same" "$ZIP"

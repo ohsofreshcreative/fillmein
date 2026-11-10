@@ -1,5 +1,6 @@
 {{--
-  Rekurencyjne drzewo podstron. Dane: $nodes (App\Models\Page::tree), $project, $depth, $canManage, $pageProgress.
+  Rekurencyjne drzewo podstron. Dane: $nodes (App\Models\Page::tree), $project, $depth, $canManage, $pageProgress,
+  $queueUrls (adresy kolejki Figmy wg ID podstrony), $canImport (masowa „Analiza i import pól”). Status kolejki: figmaQueue.
   Hierarchia jest oddana semantycznie zagnieżdżonymi listami, nie samym wcięciem.
 --}}
 @php($depth = $depth ?? 0)
@@ -9,7 +10,18 @@
     @php($page = $node['page'])
     @php($stats = $pageProgress[$page->id] ?? ['total' => 0, 'filled' => 0, 'percent' => 0])
     <li>
-      <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-ink-150 bg-white px-4 py-3">
+      <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-ink-150 bg-white px-4 py-3" data-page-row="{{ $page->id }}">
+        <div class="flex min-w-0 items-start gap-3">
+        @if (($canImport ?? false) && isset(($queueUrls ?? [])[$page->id]['import']))
+          <input
+            type="checkbox"
+            value="{{ $page->id }}"
+            x-model="selected"
+            class="mt-1 size-4 shrink-0 cursor-pointer rounded accent-ink-900"
+            aria-label="Zaznacz do analizy i importu pól: {{ $page->name }}"
+            data-figma-bulk-page
+          >
+        @endif
         <div class="min-w-0">
           <p class="flex flex-wrap items-center gap-2 font-medium text-ink-950">
             {{ $page->name }}
@@ -32,6 +44,15 @@
               · <span class="text-warning-800">bez frame'u Figmy</span>
             @endif
           </p>
+          @if (isset(($queueUrls ?? [])[$page->id]))
+            <p x-show="status[{{ $page->id }}]" x-cloak class="mt-1 text-sm" role="status" aria-live="polite" data-figma-status="{{ $page->id }}">
+              <span
+                x-bind:class="{ 'text-success-800': status[{{ $page->id }}]?.state === 'done', 'text-warning-800': status[{{ $page->id }}]?.state === 'warning', 'text-danger-700': status[{{ $page->id }}]?.state === 'error', 'text-ink-500': ['queued', 'running'].includes(status[{{ $page->id }}]?.state) }"
+                x-text="label({{ $page->id }})"
+              ></span>
+            </p>
+          @endif
+        </div>
         </div>
 
         <x-ui.progress
@@ -85,6 +106,8 @@
           'project' => $project,
           'depth' => $depth + 1,
           'canManage' => $canManage,
+          'queueUrls' => $queueUrls ?? [],
+          'canImport' => $canImport ?? false,
         ])
       @endif
     </li>

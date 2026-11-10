@@ -63,7 +63,8 @@ check "Zapis: spoza projektu" 404 "$(postas "$C_OUTSIDER" "$BASE/site-mapping/$H
 check "Przywracanie: przypisany bez capability" 403 "$(postas "$C_MEMBER" "$BASE/site-mapping/$HOME_ID/restore")"
 fresh
 check "Podstrona innego projektu" 404 "$(post --data 'complete=1' "$BASE/site-mapping/$PB_PAGE")"
-check "Automat bez schematu" 404 "$(post "$BASE/site-mapping/auto")"
+check "Automat bez schematu → przekierowanie" 302 "$(post "$BASE/site-mapping/auto")"
+has "Komunikat: najpierw schemat" "$(admin "$MAPPING")" 'Najpierw wgraj schemat strony.'
 
 echo "== Wgranie i przegląd =="
 fresh

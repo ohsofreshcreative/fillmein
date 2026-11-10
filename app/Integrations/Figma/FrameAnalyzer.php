@@ -113,17 +113,20 @@ final class FrameAnalyzer
 			$children = $this->included($only, $path);
 		}
 
+		// Puste warstwy wewnątrz sekcji nie trafiają na listę wykluczeń — także przy rozbijaniu dużych frame'ów.
 		$this->recordEmpty = false;
+		$frameWidth = (float) ($document['box']['width'] ?? 0);
+		$candidates = $this->split(array_map(fn ($node) => [$node, $path, false], $children), $frameWidth, 0, $wrappers);
 		$sections = [];
 
-		foreach ($children as $node) {
+		foreach ($candidates as [$node, $nodePath, $fromSplit]) {
 			$fields = ($node['type'] ?? '') === 'TEXT'
 				? [$this->textField($node, 0, null)]
-				: $this->fields($node, 0, [...$path, (string) ($node['name'] ?? '')]);
+				: $this->fields($node, 0, [...$nodePath, (string) ($node['name'] ?? '')]);
 
 			$sections[] = [
 				'node_id' => (string) $node['id'],
-				'name' => $this->sectionName($node),
+				'name' => $fromSplit ? $this->splitSectionName($node, $nodePath) : $this->sectionName($node),
 				'position' => count($sections),
 				'meta' => $this->meta($node),
 				'fields' => $this->positioned($fields),
@@ -138,6 +141,47 @@ final class FrameAnalyzer
 			'restored' => array_values($this->restored),
 			'stats' => $this->stats($sections),
 		];
+	}
+
+	/**
+	 * Duży frame z kilkoma blokami w środku (np. cała treść podstrony w jednym „Frame 318”) rozbijamy na jego
+	 * dzieci, żeby każdy blok był osobną sekcją. Rozbijamy też frame, którego jedno dziecko samo jest duże
+	 * (np. pasek zakładek + jeden wysoki kontener z sekcjami). Rozbijany frame trafia do `wrappers`.
+	 *
+	 * @param array<int, array{0: array, 1: string[], 2: bool}> $candidates [warstwa, ścieżka rodzica, wydzielona z dużego frame'u]
+	 * @return array<int, array{0: array, 1: string[], 2: bool}>
+	 */
+	private function split(array $candidates, float $frameWidth, int $level, array &$wrappers): array
+	{
+		if (empty($this->config['split_large_frames'] ?? true)) {
+			return $candidates;
+		}
+
+		$result = [];
+		$minHeight = max((float) ($this->config['split_min_height'] ?? 1200), (float) ($this->config['split_min_height_ratio'] ?? 1.0) * $frameWidth);
+		$childMin = (float) ($this->config['split_child_min_height'] ?? 300);
+		$fullWidth = (float) ($this->config['split_full_width_ratio'] ?? 0.9);
+
+		foreach ($candidates as [$node, $path, $fromSplit]) {
+			$nodePath = [...$path, (string) ($node['name'] ?? '')];
+			$inner = ($node['type'] ?? '') === 'TEXT' || empty($node['children']) ? [] : $this->included($node, $nodePath);
+			// Sekcja strony zajmuje pełną szerokość frame'u; wiersze listy czy karty leżą w węższym kontenerze treści.
+			$blocks = array_filter($inner, fn ($child) => ($child['type'] ?? '') !== 'TEXT'
+				&& (float) ($child['box']['height'] ?? 0) >= $childMin
+				&& ($frameWidth <= 0 || (float) ($child['box']['width'] ?? 0) >= $fullWidth * $frameWidth)
+				&& $this->texts($child, $nodePath) !== []);
+
+			if ($level < (int) ($this->config['split_max_levels'] ?? 3)
+				&& (float) ($node['box']['height'] ?? 0) >= $minHeight
+				&& (count($blocks) >= 2 || array_filter($blocks, fn ($child) => (float) ($child['box']['height'] ?? 0) >= $minHeight) !== [])) {
+				$wrappers[] = (string) $node['id'];
+				array_push($result, ...$this->split(array_map(fn ($child) => [$child, $nodePath, true], $inner), $frameWidth, $level + 1, $wrappers));
+			} else {
+				$result[] = [$node, $path, $fromSplit];
+			}
+		}
+
+		return $result;
 	}
 
 	/**
@@ -643,6 +687,29 @@ final class FrameAnalyzer
 		$base = trim((string) preg_replace('/[\s_\-#.]*\d+$/u', '', $name));
 
 		return $base !== '' ? $base : $name;
+	}
+
+	/**
+	 * Sekcja wydzielona z dużego frame'u ma zwykle techniczną nazwę warstwy („content”) — wtedy nazwą jest
+	 * jej pierwszy tekst (zwykle nagłówek).
+	 */
+	private function splitSectionName(array $node, array $path): string
+	{
+		$name = $this->clean((string) ($node['name'] ?? ''));
+
+		if ($name !== '' && $this->meaningful($name, self::GENERIC_CONTAINER)) {
+			return mb_substr($name, 0, 190);
+		}
+
+		foreach ($this->texts($node, $path) as $text) {
+			$excerpt = preg_replace('/\s+/u', ' ', trim((string) ($text['characters'] ?? ''))) ?? '';
+
+			if ($excerpt !== '') {
+				return mb_strlen($excerpt) > 60 ? rtrim(mb_substr($excerpt, 0, 60)) . '…' : $excerpt;
+			}
+		}
+
+		return $this->sectionName($node);
 	}
 
 	private function sectionName(array $node): string

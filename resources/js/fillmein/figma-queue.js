@@ -1,0 +1,183 @@
+/**
+ * Kolejka Figmy na liście podstron projektu.
+ *
+ * - „Dodaj podstronę” zapisuje podstronę bez przeładowania i bez czekania na Figmę; frame pobiera się w tle,
+ *   a formularz od razu przyjmuje kolejną podstronę.
+ * - Podstrony z linkiem, których frame jeszcze nie pobrano (np. po przeładowaniu), trafiają do kolejki same.
+ * - Masowa „Analiza i import pól” przetwarza zaznaczone podstrony po kolei (FigmaQueueController).
+ *
+ * Zadania idą jedno po drugim, żeby nie przekroczyć limitów API Figmy. Rozpoczęte zadanie serwer kończy
+ * także po opuszczeniu strony; ostrzeżenie przed wyjściem dotyczy zadań, które jeszcze czekają.
+ */
+const RETRY_DELAY = 4000;
+const MAX_RETRIES = 40;
+
+export function figmaQueue({ pending = [], urls = {}, storeUrl = '' } = {}) {
+  return {
+    urls: { ...urls },
+    jobs: [],
+    status: {},
+    selected: [],
+    added: [],
+    running: false,
+    adding: false,
+    formErrors: {},
+    formMessage: '',
+
+    init() {
+      pending.forEach((id) => this.enqueue(id, 'fetch'));
+
+      window.addEventListener('beforeunload', (event) => {
+        if (this.jobs.length > 0) {
+          event.preventDefault();
+          event.returnValue = '';
+        }
+      });
+    },
+
+    get busy() {
+      return this.running || this.jobs.length > 0;
+    },
+
+    get finished() {
+      return Object.values(this.status).filter((item) => ['done', 'warning', 'error'].includes(item.state)).length;
+    },
+
+    get total() {
+      return Object.keys(this.status).length;
+    },
+
+    label(id) {
+      const item = this.status[id];
+
+      if (!item) {
+        return '';
+      }
+
+      const kind = item.kind === 'import' ? 'Analiza i import' : 'Pobieranie z Figmy';
+
+      return {
+        queued: `${kind}: w kolejce`,
+        running: `${kind}…`,
+        done: item.message,
+        warning: item.message,
+        error: item.message,
+      }[item.state] ?? '';
+    },
+
+    variant(id) {
+      return { queued: 'muted', running: 'neutral', done: 'success', warning: 'warning', error: 'danger' }[this.status[id]?.state] ?? 'muted';
+    },
+
+    enqueue(id, kind) {
+      const url = this.urls[id]?.[kind];
+
+      if (!url || this.jobs.some((job) => job.id === id && job.kind === kind)) {
+        return;
+      }
+
+      this.jobs.push({ id, kind, url, attempts: 0 });
+      this.status[id] = { state: 'queued', kind, message: '' };
+      this.run();
+    },
+
+    importSelected() {
+      [...this.selected].forEach((id) => this.enqueue(Number(id), 'import'));
+      this.selected = [];
+    },
+
+    selectAll() {
+      this.selected = Object.keys(this.urls).filter((id) => this.urls[id].import).map(String);
+    },
+
+    async run() {
+      if (this.running) {
+        return;
+      }
+
+      this.running = true;
+
+      while (this.jobs.length > 0) {
+        const job = this.jobs.shift();
+        this.status[job.id] = { state: 'running', kind: job.kind, message: '' };
+
+        try {
+          const result = await this.post(job.url);
+
+          if (result.status === 'running' && job.attempts < MAX_RETRIES) {
+            // Ta podstrona jest właśnie przetwarzana (np. zadanie sprzed przeładowania) — sprawdzimy za chwilę.
+            this.status[job.id] = { state: 'queued', kind: job.kind, message: '' };
+            await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+            this.jobs.push({ ...job, attempts: job.attempts + 1 });
+
+            continue;
+          }
+
+          this.status[job.id] = { state: result.status === 'running' ? 'warning' : result.status, kind: job.kind, message: result.message };
+        } catch (error) {
+          this.status[job.id] = { state: 'error', kind: job.kind, message: error.message };
+        }
+      }
+
+      this.running = false;
+    },
+
+    async post(url, body = null) {
+      const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          Accept: 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+        },
+        body,
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        const error = new Error(data.message || (response.status === 419
+          ? 'Sesja wygasła — odśwież stronę.'
+          : 'Nie udało się połączyć z serwerem. Spróbuj ponownie.'));
+        error.errors = data.errors ?? {};
+        error.code = response.status;
+        throw error;
+      }
+
+      return data;
+    },
+
+    async addPage(form) {
+      if (this.adding) {
+        return;
+      }
+
+      this.adding = true;
+      this.formErrors = {};
+      this.formMessage = '';
+
+      try {
+        const page = await this.post(storeUrl, new FormData(form));
+
+        this.added.push(page);
+        this.formMessage = page.message;
+        form.reset();
+        form.querySelector('[name="name"]')?.focus();
+
+        if (page.queued) {
+          this.urls[page.id] = { fetch: page.fetch_url };
+          this.enqueue(page.id, 'fetch');
+        }
+      } catch (error) {
+        this.formErrors = Object.fromEntries(Object.entries(error.errors ?? {}).map(([key, messages]) => [key, [].concat(messages)[0]]));
+
+        if (Object.keys(this.formErrors).length === 0) {
+          this.formErrors = { form: error.message };
+        }
+      } finally {
+        this.adding = false;
+      }
+    },
+  };
+}

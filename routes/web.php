@@ -29,6 +29,7 @@ use App\Http\Controllers\App\ExportController;
 use App\Http\Controllers\App\FieldController;
 use App\Http\Controllers\App\FigmaController;
 use App\Http\Controllers\App\FigmaImportController;
+use App\Http\Controllers\App\FigmaQueueController;
 use App\Http\Controllers\App\FigmaSettingsController;
 use App\Http\Controllers\App\MappingController;
 use App\Http\Controllers\App\PageController;
@@ -147,6 +148,8 @@ Route::middleware(['web', 'fmi.app:staff', 'fmi.staff'])
 									Route::post('restore', [PageController::class, 'restore'])->name('restore');
 
 									Route::post('figma', [FigmaController::class, 'fetch'])->name('figma.fetch');
+									Route::post('figma/queue/fetch', [FigmaQueueController::class, 'fetch'])->name('figma.queue.fetch');
+									Route::post('figma/queue/import', [FigmaQueueController::class, 'import'])->name('figma.queue.import');
 									Route::get('figma/preview/{node}', [FigmaController::class, 'preview'])
 										->where('node', '[0-9]{1,10}-[0-9]{1,10}')
 										->name('figma.preview');
