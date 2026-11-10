@@ -105,10 +105,11 @@ export function figmaQueue({ pending = [], urls = {}, storeUrl = '' } = {}) {
         try {
           const result = await this.post(job.url);
 
-          if (result.status === 'running' && job.attempts < MAX_RETRIES) {
-            // Ta podstrona jest właśnie przetwarzana (np. zadanie sprzed przeładowania) — sprawdzimy za chwilę.
+          if (['running', 'retry'].includes(result.status) && job.attempts < (result.status === 'retry' ? 5 : MAX_RETRIES)) {
+            // Podstrona jest właśnie przetwarzana (np. zadanie sprzed przeładowania) albo Figma chwilowo ogranicza
+            // zapytania — spróbujemy ponownie za chwilę.
             this.status[job.id] = { state: 'queued', kind: job.kind, message: '' };
-            await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+            await new Promise((resolve) => setTimeout(resolve, result.status === 'retry' ? RETRY_DELAY * 4 : RETRY_DELAY));
             this.jobs.push({ ...job, attempts: job.attempts + 1 });
 
             continue;
@@ -125,7 +126,7 @@ export function figmaQueue({ pending = [], urls = {}, storeUrl = '' } = {}) {
             continue;
           }
 
-          const state = { running: 'warning', continue: 'warning' }[result.status] ?? result.status;
+          const state = { running: 'warning', continue: 'warning', retry: 'error' }[result.status] ?? result.status;
           this.status[job.id] = { state, kind: job.kind, message: result.message };
         } catch (error) {
           this.status[job.id] = { state: 'error', kind: job.kind, message: error.message };

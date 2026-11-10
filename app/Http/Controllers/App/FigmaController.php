@@ -28,6 +28,8 @@ class FigmaController extends Controller
 
 	public function fetch(FetchFigmaFrameRequest $request, Project $project, Page $page): RedirectResponse
 	{
+		$this->frames->limitTime((float) config('fillmein.figma.request_budget_seconds', 20));
+
 		try {
 			$result = $this->frames->fetch($page, Staff::current(), $request->force());
 		} catch (FigmaException $e) {

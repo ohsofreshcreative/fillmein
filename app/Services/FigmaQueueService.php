@@ -23,7 +23,7 @@ class FigmaQueueService
 	private const LOCK_SECONDS = 300;
 
 	/** Budżet czasu jednej porcji podglądów — mieści się w typowym limicie 30 s hostingu. */
-	private const PREVIEW_BUDGET = 12.0;
+	private const PREVIEW_BUDGET = 8.0;
 
 	public function __construct(private FigmaFrameService $frames, private FigmaImportService $import)
 	{
@@ -145,11 +145,19 @@ class FigmaQueueService
 			return ['status' => 'running', 'message' => 'Trwa przetwarzanie tej podstrony.'];
 		}
 
+		$this->frames->limitTime((float) config('fillmein.figma.request_budget_seconds', 20));
+
 		try {
 			return $work();
-		} catch (FigmaException|FigmaImportException $e) {
+		} catch (FigmaException $e) {
+			// Limit zapytań i wolna odpowiedź są chwilowe — kolejka spróbuje ponownie (status `retry`).
+			$retry = in_array($e->kind, [FigmaException::RATE_LIMITED, FigmaException::TIMEOUT, FigmaException::SERVER], true);
+
+			return ['status' => $retry ? 'retry' : 'error', 'message' => $e->getMessage()];
+		} catch (FigmaImportException $e) {
 			return ['status' => 'error', 'message' => $e->getMessage()];
 		} finally {
+			$this->frames->limitTime(null);
 			delete_option($key);
 		}
 	}

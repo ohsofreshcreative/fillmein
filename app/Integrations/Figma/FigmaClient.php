@@ -28,6 +28,9 @@ class FigmaClient
 	/** @var Closure(float): void */
 	private Closure $sleep;
 
+	/** Termin (microtime) całego żądania HTTP aplikacji — po nim nie wysyłamy ani nie ponawiamy zapytań. */
+	private ?float $deadline = null;
+
 	public function __construct(
 		private HttpFactory $http,
 		?Closure $sleep = null,
@@ -122,7 +125,7 @@ class FigmaClient
 
 		$response = $this->send(fn () => $this->http
 			->withoutRedirecting()
-			->timeout((float) config('fillmein.figma.timeout', 20))
+			->timeout($this->attemptTimeout())
 			->connectTimeout((float) config('fillmein.figma.connect_timeout', 5))
 			->withOptions(['on_headers' => $this->sizeGuard($maxBytes)])
 			->get($url));
@@ -166,7 +169,7 @@ class FigmaClient
 			->withHeaders($headers)
 			->acceptJson()
 			->withoutRedirecting()
-			->timeout((float) config('fillmein.figma.timeout', 20))
+			->timeout($this->attemptTimeout())
 			->connectTimeout((float) config('fillmein.figma.connect_timeout', 5))
 			->withOptions(['on_headers' => $this->sizeGuard($maxBytes)])
 			->get($path, $query));
@@ -225,7 +228,7 @@ class FigmaClient
 					throw new FigmaException(FigmaException::TIMEOUT, 'Brak połączenia z Figmą lub przekroczono czas odpowiedzi.', null, $attempt);
 				}
 
-				($this->sleep)($this->backoff($attempt));
+				$this->pause($this->backoff($attempt), FigmaException::TIMEOUT, $attempt);
 
 				continue;
 			} catch (FigmaException $e) {
@@ -261,8 +264,45 @@ class FigmaClient
 				}
 			}
 
-			($this->sleep)(max(0.0, $wait));
+			$this->pause(max(0.0, $wait), $status === 429 ? FigmaException::RATE_LIMITED : FigmaException::SERVER, $attempt, $status);
 		}
+	}
+
+	private function pause(float $seconds, string $kind, int $attempt, ?int $status = null): void
+	{
+		if ($this->deadline !== null && microtime(true) + $seconds + 2.0 > $this->deadline) {
+			throw new FigmaException($kind, $kind === FigmaException::RATE_LIMITED
+				? 'Figma chwilowo ogranicza liczbę zapytań — spróbuję ponownie za chwilę.'
+				: 'Figma odpowiada zbyt wolno — spróbuję ponownie za chwilę.', $status, $attempt);
+		}
+
+		($this->sleep)($seconds);
+	}
+
+	/**
+	 * Hosting przerywa długie żądania błędem 500 (próby × timeout + przerwy to nawet ~70 s). Z terminem
+	 * zapytania kończą się kontrolowanym FigmaException::TIMEOUT, który kolejka ponawia w kolejnym żądaniu.
+	 */
+	public function setDeadline(?float $seconds): void
+	{
+		$this->deadline = $seconds === null ? null : microtime(true) + max(1.0, $seconds);
+	}
+
+	private function attemptTimeout(): float
+	{
+		$timeout = (float) config('fillmein.figma.timeout', 20);
+
+		if ($this->deadline === null) {
+			return $timeout;
+		}
+
+		$left = $this->deadline - microtime(true);
+
+		if ($left < 2.0) {
+			throw new FigmaException(FigmaException::TIMEOUT, 'Figma odpowiada zbyt wolno — spróbuję ponownie za chwilę.');
+		}
+
+		return min($timeout, $left);
 	}
 
 	private function figmaCause(\Throwable $e): ?FigmaException

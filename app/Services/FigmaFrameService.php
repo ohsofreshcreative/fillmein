@@ -37,6 +37,14 @@ class FigmaFrameService
 	) {
 	}
 
+	/**
+	 * Limit czasu wywołań Figmy w bieżącym żądaniu (sekundy, null = bez limitu) — patrz FigmaClient::setDeadline.
+	 */
+	public function limitTime(?float $seconds): void
+	{
+		$this->client->setDeadline($seconds);
+	}
+
 	public function isConfigured(): bool
 	{
 		return $this->client->isConfigured();

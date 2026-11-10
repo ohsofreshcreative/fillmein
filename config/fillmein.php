@@ -140,7 +140,11 @@ return [
 
 		// Ile sekund jedno żądanie „Pobierz z Figmy” może pobierać podglądy PNG (reszta przy pierwszym wyświetleniu).
 		// Hosting zwykle przerywa żądania po 30–60 s.
-		'preview_budget_seconds' => 12,
+		'preview_budget_seconds' => 8,
+
+		// Łączny limit czasu zapytań do Figmy w jednym żądaniu („Pobierz z Figmy”, kolejka). Po nim zamiast
+		// błędu 500 hostingu jest kontrolowany komunikat, a kolejka ponawia zadanie.
+		'request_budget_seconds' => 20,
 
 		// Adres obrazu z /v1/images jest tymczasowy (Figma: do 30 dni). Odświeżamy go wcześniej.
 		'image_url_ttl_hours' => 24 * 14,
