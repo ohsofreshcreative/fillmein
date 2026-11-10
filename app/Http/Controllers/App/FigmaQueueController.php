@@ -25,6 +25,11 @@ class FigmaQueueController extends Controller
 		return response()->json($this->queue->fetch($page, Staff::current()));
 	}
 
+	public function previews(FetchFigmaFrameRequest $request, Project $project, Page $page): JsonResponse
+	{
+		return response()->json($this->queue->previews($page));
+	}
+
 	public function import(AutoImportFigmaRequest $request, Project $project, Page $page): JsonResponse
 	{
 		return response()->json($this->queue->import($page, Staff::current()));

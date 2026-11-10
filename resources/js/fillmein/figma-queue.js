@@ -6,11 +6,12 @@
  * - Podstrony z linkiem, których frame jeszcze nie pobrano (np. po przeładowaniu), trafiają do kolejki same.
  * - Masowa „Analiza i import pól” przetwarza zaznaczone podstrony po kolei (FigmaQueueController).
  *
- * Zadania idą jedno po drugim, żeby nie przekroczyć limitów API Figmy. Rozpoczęte zadanie serwer kończy
- * także po opuszczeniu strony; ostrzeżenie przed wyjściem dotyczy zadań, które jeszcze czekają.
+ * Zadania idą jedno po drugim, żeby nie przekroczyć limitów API Figmy. Każde żądanie jest krótkie: najpierw
+ * struktura warstw, potem podglądy w porcjach (status `continue`) — długie żądania hosting przerywa błędem 500.
  */
 const RETRY_DELAY = 4000;
 const MAX_RETRIES = 40;
+const MAX_BATCHES = 20;
 
 export function figmaQueue({ pending = [], urls = {}, storeUrl = '' } = {}) {
   return {
@@ -58,7 +59,7 @@ export function figmaQueue({ pending = [], urls = {}, storeUrl = '' } = {}) {
 
       return {
         queued: `${kind}: w kolejce`,
-        running: `${kind}…`,
+        running: item.message || `${kind}…`,
         done: item.message,
         warning: item.message,
         error: item.message,
@@ -113,7 +114,19 @@ export function figmaQueue({ pending = [], urls = {}, storeUrl = '' } = {}) {
             continue;
           }
 
-          this.status[job.id] = { state: result.status === 'running' ? 'warning' : result.status, kind: job.kind, message: result.message };
+          const next = this.urls[job.id]?.previews;
+          const batch = (job.batch ?? 0) + 1;
+
+          if (result.status === 'continue' && next && batch <= MAX_BATCHES) {
+            // Kolejna porcja tej samej podstrony idzie od razu, przed innymi podstronami.
+            this.status[job.id] = { state: 'running', kind: job.kind, message: result.message };
+            this.jobs.unshift({ id: job.id, kind: job.kind, url: next, attempts: 0, batch });
+
+            continue;
+          }
+
+          const state = { running: 'warning', continue: 'warning' }[result.status] ?? result.status;
+          this.status[job.id] = { state, kind: job.kind, message: result.message };
         } catch (error) {
           this.status[job.id] = { state: 'error', kind: job.kind, message: error.message };
         }
@@ -137,9 +150,11 @@ export function figmaQueue({ pending = [], urls = {}, storeUrl = '' } = {}) {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        const error = new Error(data.message || (response.status === 419
+        const error = new Error(response.status === 419
           ? 'Sesja wygasła — odśwież stronę.'
-          : 'Nie udało się połączyć z serwerem. Spróbuj ponownie.'));
+          : response.status >= 500
+            ? `Błąd serwera (${response.status}) — spróbuj ponownie lub użyj „Pobierz z Figmy” w edycji podstrony.`
+            : data.message || 'Nie udało się połączyć z serwerem. Spróbuj ponownie.');
         error.errors = data.errors ?? {};
         error.code = response.status;
         throw error;
@@ -166,7 +181,7 @@ export function figmaQueue({ pending = [], urls = {}, storeUrl = '' } = {}) {
         form.querySelector('[name="name"]')?.focus();
 
         if (page.queued) {
-          this.urls[page.id] = { fetch: page.fetch_url };
+          this.urls[page.id] = { fetch: page.fetch_url, previews: page.previews_url };
           this.enqueue(page.id, 'fetch');
         }
       } catch (error) {

@@ -50,6 +50,7 @@ check "Nazwa w odpowiedzi" '"Szybka podstrona"' "$(field name < "$WORK/add.json"
 # Bez skonfigurowanej Figmy nie ma czego pobierać w tle — wtedy odpowiedź mówi queued=false.
 if [ "$(field queued < "$WORK/add.json")" = true ]; then
   has "Adres kolejki w odpowiedzi" "$(field fetch_url < "$WORK/add.json")" '/figma/queue/fetch'
+  has "Adres porcji podglądów" "$(field previews_url < "$WORK/add.json")" '/figma/queue/previews'
 else
   check "Bez Figmy: brak zadania w tle" 'null' "$(field fetch_url < "$WORK/add.json")"
 fi
@@ -64,12 +65,15 @@ echo "== Kolejka: odpowiedzi =="
 CSRF=$(meta "$HTML")
 check "Pobranie bez linku: 200" 200 "$(api -o "$WORK/q.json" -w '%{http_code}' "$BASE/pages/$PLAIN/figma/queue/fetch")"
 check "Status błędu w JSON" '"error"' "$(field status < "$WORK/q.json")"
+check "Podglądy bez frame'u: 200" 200 "$(api -o "$WORK/p.json" -w '%{http_code}' "$BASE/pages/$PLAIN/figma/queue/previews")"
+check "Status podglądów w JSON" '"error"' "$(field status < "$WORK/p.json")"
 check "Import bez linku: 200" 200 "$(api -o "$WORK/i.json" -w '%{http_code}' "$BASE/pages/$PLAIN/figma/queue/import")"
 check "Status importu w JSON" '"error"' "$(field status < "$WORK/i.json")"
 
 echo "== Uprawnienia =="
 check "Bez CSRF" 419 "$(code -H "Cookie: $C_ADMIN" -H 'Accept: application/json' -X POST "$BASE/pages/$PLAIN/figma/queue/fetch")"
 check "Pobranie: spoza projektu" 404 "$(postas "$C_OUTSIDER" "$BASE/pages/$PLAIN/figma/queue/fetch")"
+check "Podglądy: spoza projektu" 404 "$(postas "$C_OUTSIDER" "$BASE/pages/$PLAIN/figma/queue/previews")"
 check "Import: spoza projektu" 404 "$(postas "$C_OUTSIDER" "$BASE/pages/$PLAIN/figma/queue/import")"
 check "Podstrona innego projektu" 404 "$(api -o /dev/null -w '%{http_code}' "$BASE/pages/$PB_PAGE/figma/queue/import")"
 # Pracownik przypisany do projektu ma fmi_manage_pages i fmi_configure_fields (jak przy ręcznym imporcie).

@@ -149,6 +149,7 @@ Route::middleware(['web', 'fmi.app:staff', 'fmi.staff'])
 
 									Route::post('figma', [FigmaController::class, 'fetch'])->name('figma.fetch');
 									Route::post('figma/queue/fetch', [FigmaQueueController::class, 'fetch'])->name('figma.queue.fetch');
+									Route::post('figma/queue/previews', [FigmaQueueController::class, 'previews'])->name('figma.queue.previews');
 									Route::post('figma/queue/import', [FigmaQueueController::class, 'import'])->name('figma.queue.import');
 									Route::get('figma/preview/{node}', [FigmaController::class, 'preview'])
 										->where('node', '[0-9]{1,10}-[0-9]{1,10}')

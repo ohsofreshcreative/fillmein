@@ -80,6 +80,7 @@ class PageController extends Controller
 				'message' => $message,
 				'queued' => $queued,
 				'fetch_url' => $queued ? route('fmi.projects.pages.figma.queue.fetch', [$project, $page]) : null,
+				'previews_url' => $queued ? route('fmi.projects.pages.figma.queue.previews', [$project, $page]) : null,
 				'edit_url' => route('fmi.projects.pages.edit', [$project, $page]),
 			], 201);
 		}

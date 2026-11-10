@@ -143,6 +143,7 @@ class ProjectController extends Controller
 				'pending' => $canFetch ? $this->figmaQueue->pending($project, $active) : [],
 				'urls' => $active->filter(fn (Page $page) => $page->figma_frame_url && ($canFetch || $canImport))->mapWithKeys(fn (Page $page) => [$page->id => array_filter([
 					'fetch' => $canFetch ? route('fmi.projects.pages.figma.queue.fetch', [$project, $page]) : null,
+					'previews' => $canFetch ? route('fmi.projects.pages.figma.queue.previews', [$project, $page]) : null,
 					'import' => $canImport ? route('fmi.projects.pages.figma.queue.import', [$project, $page]) : null,
 				])])->all(),
 				'storeUrl' => route('fmi.projects.pages.store', $project),

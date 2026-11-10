@@ -69,7 +69,7 @@ class FigmaFrameService
 	/**
 	 * @return array{frame: FigmaFrame, from_cache: bool, previews: int, previews_failed: int}
 	 */
-	public function fetch(Page $page, WP_User $by, bool $force = false): array
+	public function fetch(Page $page, WP_User $by, bool $force = false, bool $previews = true): array
 	{
 		$target = FigmaUrl::frame($page->figma_frame_url);
 
@@ -77,7 +77,26 @@ class FigmaFrameService
 			throw new FigmaException(FigmaException::INVALID_LINK, 'Podstrona nie ma poprawnego linku do frame\'u Figmy (adres z parametrem node-id).');
 		}
 
-		return $this->fetchTarget($page->project, $target, $by, $force, $page);
+		return $this->fetchTarget($page->project, $target, $by, $force, $page, $previews);
+	}
+
+	/**
+	 * Porcja podglądów dla kolejki w tle: pobiera brakujące pliki, dopóki nie minie budżet czasu (sekundy),
+	 * żeby pojedyncze żądanie nie przekroczyło limitu czasu serwera. Wymaga zapisanego frame'u.
+	 *
+	 * @return array{downloaded: int, failed: int, remaining: int}
+	 */
+	public function previewBatch(Page $page, float $budget): array
+	{
+		$frame = $this->frameFor($page);
+
+		if (! $frame) {
+			throw new FigmaException(FigmaException::NOT_FOUND, 'Najpierw pobierz frame z Figmy.');
+		}
+
+		[$downloaded, $failed, $remaining] = $this->syncPreviews($frame, microtime(true) + $budget);
+
+		return ['downloaded' => $downloaded, 'failed' => $failed, 'remaining' => $remaining];
 	}
 
 	/**
@@ -87,11 +106,11 @@ class FigmaFrameService
 	 * @param array{file_key: string, node_id: string} $target
 	 * @return array{frame: FigmaFrame, from_cache: bool, previews: int, previews_failed: int}
 	 */
-	public function fetchTarget(Project $project, array $target, WP_User $by, bool $force = false, ?Page $page = null): array
+	public function fetchTarget(Project $project, array $target, WP_User $by, bool $force = false, ?Page $page = null, bool $previews = true): array
 	{
 		$cached = $this->frameForTarget($project, $target);
 
-		if (! $force && $cached && $cached->isFresh() && $this->previewsComplete($cached)) {
+		if (! $force && $cached && $cached->isFresh() && (! $previews || $this->previewsComplete($cached))) {
 			return ['frame' => $cached, 'from_cache' => true, 'previews' => 0, 'previews_failed' => 0];
 		}
 
@@ -143,7 +162,8 @@ class FigmaFrameService
 			return $frame;
 		});
 
-		[$downloaded, $failed] = $this->syncPreviews($frame);
+		// Bez podglądów (kolejka w tle) pliki dociąga previewBatch w kolejnych, krótkich żądaniach.
+		[$downloaded, $failed] = $previews ? $this->syncPreviews($frame) : [0, 0];
 
 		$this->activity->log('figma.frame_fetched', Actor::user($by), $project, $page, array_filter([
 			'page_name' => $page?->name,
@@ -316,7 +336,10 @@ class FigmaFrameService
 	 *
 	 * @return array{0: int, 1: int} [pobrane, nieudane]
 	 */
-	private function syncPreviews(FigmaFrame $frame): array
+	/**
+	 * @return array{0: int, 1: int, 2: int} [pobrane, nieudane, pozostałe po przekroczeniu terminu]
+	 */
+	private function syncPreviews(FigmaFrame $frame, ?float $deadline = null): array
 	{
 		$nodes = [['id' => $frame->node_id, 'name' => $frame->node_name]];
 
@@ -359,10 +382,10 @@ class FigmaFrameService
 		}
 
 		if ($pending->isEmpty()) {
-			return [0, 0];
+			return [0, 0, 0];
 		}
 
-		return $this->downloadPreviews($frame, $pending);
+		return $this->downloadPreviews($frame, $pending, $deadline);
 	}
 
 	/**
@@ -370,9 +393,9 @@ class FigmaFrameService
 	 * adres z cache, który przestał działać, odświeżamy raz i ponawiamy pobranie.
 	 *
 	 * @param \Illuminate\Support\Collection<int, FigmaPreview> $previews
-	 * @return array{0: int, 1: int}
+	 * @return array{0: int, 1: int, 2: int}
 	 */
-	private function downloadPreviews(FigmaFrame $frame, $previews): array
+	private function downloadPreviews(FigmaFrame $frame, $previews, ?float $deadline = null): array
 	{
 		$version = self::previewVersion($frame);
 		$stale = $previews->filter(fn (FigmaPreview $p) => ! $p->remoteUrlValid() || $p->file_version !== $version);
@@ -382,14 +405,20 @@ class FigmaFrameService
 				$this->refreshUrls($frame, $stale);
 			} catch (FigmaException) {
 				// Metadane frame'u są już zapisane; brak podglądów raportujemy jako nieudane.
-				return [0, $previews->count()];
+				return [0, $previews->count(), 0];
 			}
 		}
 
 		$downloaded = 0;
 		$failed = 0;
+		$done = 0;
 
 		foreach ($previews as $preview) {
+			if ($deadline !== null && $done > 0 && microtime(true) >= $deadline) {
+				return [$downloaded, $failed, $previews->count() - $done];
+			}
+
+			$done++;
 			$fresh = $stale->contains(fn (FigmaPreview $p) => $p->is($preview));
 
 			try {
@@ -414,7 +443,7 @@ class FigmaFrameService
 			}
 		}
 
-		return [$downloaded, $failed];
+		return [$downloaded, $failed, 0];
 	}
 
 	/**
