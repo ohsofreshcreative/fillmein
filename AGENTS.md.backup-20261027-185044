@@ -1,0 +1,145 @@
+AGENTS.md
+
+Wspólne instrukcje dla Claude Code, Codex i GitHub Copilot.
+Edytuj wyłącznie ten plik. `CLAUDE.md` jest dowiązaniem do `AGENTS.md`.
+
+⸻
+
+Projekt
+
+To repozytorium to **Fill Me In** — aplikacja OhSoFresh Creative do zbierania treści od klientów na podstawie
+projektów w Figmie. Działa jako motyw WordPress oparty o **Sage 11 + Acorn 5** (Laravel 12) w osobnej
+instalacji Local (`/Users/Arek/Websites/fillmein`). Motyw nie ma publicznego frontu strony — front WordPressa
+przekierowuje do `/app`.
+
+Zanim zaczniesz:
+
+1. Przeczytaj `PROJECT.md` (architektura, baza danych, uprawnienia, bezpieczeństwo, roadmapa, stan prac).
+2. Przeczytaj `DEVELOPMENT.md` (komendy, WP-CLI na Local, migracje, build).
+3. Pracuj wyłącznie w zakresie bieżącego etapu roadmapy. Po etapie zaktualizuj
+   „Aktualny stan implementacji” w `PROJECT.md`.
+
+⸻
+
+Mapa repozytorium
+
+| Ścieżka | Zawartość |
+|---|---|
+| `functions.php` | bootstrap Acorna: providery, routing, middleware (CSRF, aliasy `fmi.*`) |
+| `routes/web.php` | trasy: `/app/*` (pracownicy), `/p/{token}` (klienci) |
+| `app/Http/Controllers/{App,Auth,Client}` | cienkie kontrolery (panel, logowanie/hasło, klient) |
+| `app/Http/Middleware` | `ApplyAppDefaults`, `EnsureStaff`, `ResolveClientAccess` |
+| `app/Http/Requests` | FormRequest — walidacja i autoryzacja zapisów |
+| `app/Models` | Eloquent, tabele `fmi_*` |
+| `app/Enums` | statusy, typy pól, pochodzenie elementów, typy aktorów |
+| `app/Services` | logika z transakcjami / dziennikiem aktywności |
+| `app/Policies` | `ProjectPolicy` (dostęp do projektów, ochrona IDOR) |
+| `app/Support` | `Staff` (pracownicy = WP_User), `Actor`, `PasswordRules` |
+| `app/Integrations/Figma` | integracja z Figmą |
+| `app/Console/Commands` | `fmi:check`, `fmi:roles` |
+| `app/Providers/FillMeInServiceProvider.php` | Gate na WP_User, morph map, dysk `fmi`, hooki WP, komendy |
+| `app/setup.php` | ustawienia motywu w WP (przekierowanie frontu do `/app`, robots) |
+| `config/fillmein.php` | konfiguracja aplikacji (bez sekretów) |
+| `database/migrations` | migracje Acorna |
+| `resources/views/fillmein` | layouty i strony aplikacji |
+| `resources/views/components/ui` | komponenty design systemu `<x-ui.*>` |
+| `resources/views/errors` | strony błędów tras aplikacji |
+| `resources/css/fillmein.css`, `resources/js/fillmein.js` | jedyne wejścia Vite (Tailwind 4, Alpine.js) |
+| `resources/lang/pl_PL` | komunikaty walidacji |
+| `public/build` | artefakty `yarn build` (śledzone w gicie) |
+
+⸻
+
+Zasady architektury
+
+- **Każdy zapis**: FormRequest (walidacja) → Policy/Gate (autoryzacja) → serwis → odpowiedź.
+  Kontrolery bez logiki biznesowej.
+- **Dostęp do projektu** zawsze przez `ProjectPolicy` i `Project::visibleTo()`. Brak przypisania → 404.
+  Elementy projektu pobieraj w jego zakresie (`$project->fields()->…`), nigdy po samym ID z żądania.
+- **Uwierzytelnianie** to sesja WordPressa. Gate Laravela pracuje na `WP_User`. Nie dodawaj guarda Laravel Auth.
+- **Autoryzacja tylko przez capabilities** `fmi_*` (lista: `RoleManager::ALL_CAPABILITIES`), nigdy przez nazwy ról.
+  Nowa capability = wpis w `RoleManager` + podbicie `fillmein.roles_version`.
+- **Konta** zmieniaj wyłącznie przez `UserService` (reguły: ostatni administrator, własne konto, role WP).
+  Przypisania do projektów — `ProjectAssignmentService`. Status konta — `AccountStatus` (meta, bez tabel).
+- Trasy z parametrem konta używają `{staffUser}` (wiązanie zwraca tylko konta aplikacji). Zapisy wyłącznie `POST`.
+- **Klienci** nie mają kont. Dostęp tylko przez `ClientAccessService::resolve()` (middleware `fmi.client`).
+  Tokenów nie loguj, nie zapisuj jawnie, nie umieszczaj w dzienniku aktywności.
+- **Definicja pola ≠ treść.** Konfiguracja w `fmi_fields`, wartości w `fmi_field_values`. Pól, sekcji
+  i podstron nie usuwaj fizycznie — `archived_at`. Elementów `source = manual` import z Figmy nie dotyka.
+- **Zapisy treści** wyłącznie przez `ContentService` (wersja, konflikty, rewizje).
+- **Schemat bazy** zmieniaj tylko nową migracją. Nie edytuj migracji wykonanych na jakimkolwiek środowisku.
+- **Pliki** klientów tylko na prywatnym dysku `fmi`, serwowane przez trasy z kontrolą dostępu.
+- Bez repozytoriów i abstrakcji „na zapas”. Nową warstwę dodawaj, gdy jest realna potrzeba.
+- Nowe zależności (Composer, Yarn) tylko z uzasadnieniem. Sprawdź najpierw `vendor/` i `node_modules/` —
+  np. `illuminate/pagination` **nie** jest zainstalowane.
+
+⸻
+
+Interfejs
+
+- Język interfejsu: polski. Nowoczesny, minimalistyczny SaaS; nie kopiuj WordPress Admin.
+- Widoki aplikacji nie wywołują `wp_head()` / `wp_footer()` — mają własny layout (`fillmein.layouts.*`).
+- Używaj tokenów z `fillmein.css` (`ink-*`, `fresh-*`, `success|warning|danger|info-*`, skala `text-xs`…`text-3xl`)
+  i komponentów `<x-ui.*>`. Paleta jest zamknięta — nie wpisuj hexów ani arbitralnych kolorów w Blade.
+- Nowy powtarzalny element UI = nowy komponent w `components/ui` + przykład na `/app/design-system`.
+- `{{ }}` dla tekstu, `{!! !!}` tylko dla HTML zsanityzowanego (`wp_kses_post`).
+- Dostępność: semantyczny HTML, etykiety pól, focus, obsługa klawiatury, `aria-*` tylko gdy potrzebne.
+- JS: Alpine.js do drobnych interakcji; logikę większych modułów trzymaj w `resources/js/fillmein/`.
+
+⸻
+
+Komendy
+
+Menedżer pakietów: **yarn**. WP-CLI na Local wymaga socketu MySQL dla `mysqli` **i** `pdo_mysql` —
+gotowy alias `fmiwp` jest w `DEVELOPMENT.md`.
+
+Agent może samodzielnie uruchamiać komendy tylko do odczytu: `php -l`, `fmiwp acorn fmi:check`,
+`fmiwp acorn route:list`, `fmiwp acorn migrate:status`, `git status/diff/log`.
+
+Tylko na wyraźną prośbę użytkownika: `fmiwp acorn migrate`, `yarn build`, `composer`/`yarn` add/remove.
+
+**Nigdy**: `migrate:fresh`, `migrate:reset`, `db:wipe` (usuwają wszystkie tabele, także WordPressa),
+operacje na bazie innych stron w Local, zmiany w innych katalogach `~/Websites/*`.
+
+⸻
+
+Formatowanie i język kodu
+
+- PHP: **tabulatory** (zgodnie z `.editorconfig`). Blade / JS / CSS: 2 spacje, LF, single quotes.
+- Nie uruchamiaj `vendor/bin/pint` na całym repo (brak `pint.json` → preset ze spacjami).
+- Identyfikatory techniczne po angielsku. Teksty interfejsu, komunikaty walidacji, komentarze
+  wyjaśniające decyzje — po polsku.
+- Komentarze tylko dla decyzji nieoczywistych, obejść i ograniczeń zewnętrznych.
+
+⸻
+
+Weryfikacja
+
+- Raportuj tylko faktycznie wykonane sprawdzenia; nie deklaruj testów, których nie uruchomiłeś.
+- Minimum przed zakończeniem: `php -l` zmienionych plików, kompilacja widoków Blade, `fmi:check`,
+  sprawdzenie tras i uprawnień (pracownik bez przypisania, klient z nieprawidłowym tokenem).
+- Po zmianach w `resources/` przypomnij o `yarn build` i commicie `public/build`.
+
+⸻
+
+Git
+
+- Nie przepisuj historii, nie rób force push, nie usuwaj gałęzi bez wyraźnej zgody.
+- Nie cofaj cudzych, niezwiązanych zmian. Commity tylko na prośbę, skupione, z opisem.
+
+⸻
+
+Bezpieczeństwo
+
+- Nigdy nie commituj ani nie wypisuj: haseł, kluczy API, kluczy prywatnych, tokenów, danych bazy, `.env`.
+- Sekrety (np. token Figma API) tylko jako stałe w `wp-config.php` lub zmienne środowiskowe.
+- **Incydent:** prywatny klucz SSH `key` (+ `key.pub`) (prawdopodobnie skopiowany z innego projektu) został wypchnięty do
+  `ohsofreshcreative/fillmein`. Nie odczytuj go, nie kopiuj i nie używaj. Plan naprawy: `PROJECT.md` →
+  „Bezpieczeństwo”. Po usunięciu pliku i rotacji klucza usuń tę notatkę.
+
+⸻
+
+Język komunikacji
+
+Komunikuj się z użytkownikiem po polsku (wyjaśnienia, pytania, podsumowania).
+W podsumowaniu wymień zmienione pliki, wykonane sprawdzenia i komendy, które musi uruchomić użytkownik.

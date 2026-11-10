@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash tests/bin/wp.sh *)",
+      "Bash(bash tests/bin/ui-audit.sh *)",
+      "Bash(bash tests/*/run.sh)",
+      "Bash(php -l *)",
+      "Bash(php tests/*)",
+      "Bash(bash -n *)",
+      "Bash(yarn build)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git check-ignore *)"
+    ],
+    "deny": [
+      "Bash(wp *)",
+      "Bash(git push *)",
+      "Bash(git commit *)",
+      "Bash(git reset *)",
+      "Bash(rm -rf *)",
+      "Read(./.env)",
+      "Read(./key)",
+      "Read(./.ai-workflow/secrets/**)",
+      "Read(//Users/Arek/Websites/fillmein/app/public/wp-config.php)"
+    ]
+  }
+}
+
+"sandbox": {
+  "enabled": true,
+  "allowUnsandboxedCommands": false,
+  "network": {
+    "allowUnixSockets": [
+      "/Users/Arek/Library/Application Support/Local/run/aMEeHOmBw/mysql/mysqld.sock"
+    ]
+  },
+  "filesystem": {
+    "allowWrite": ["~/Desktop"]
+  }
+}

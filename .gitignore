@@ -29,6 +29,32 @@ deploy/
 .env
 .env.*
 
+# === Sekrety i pliki wrażliwe ===
+# `key`/`key.pub` są nadal ŚLEDZONE (incydent z commita 6896373) — reguła chroni tylko przed
+# ponownym dodaniem. Usunięcie z indeksu i historii: PROJECT.md → „Bezpieczeństwo”.
+/key
+/key.pub
+*.pem
+*.key
+*.p12
+id_rsa*
+id_ed25519*
+auth.json
+*.sql
+*.sql.gz
+
+# === Workflow AI (lokalne: sekrety, logi sesji, kopie robocze) ===
+# Cały katalog jest lokalnym narzędziem pracy i nie trafia do repo (decyzja D3).
+# Szczegółowe reguły zostają na wypadek odblokowania pojedynczych plików.
+.ai-workflow/
+.ai-workflow/secrets/
+.ai-workflow/logs/
+.ai-workflow/checkpoints/
+.ai-workflow/figma-test-url.txt
+
+# === Claude Code (lokalne uprawnienia) ===
+.claude/settings.local.json
+
 # === System & edytory ===
 .DS_Store
 *.swp

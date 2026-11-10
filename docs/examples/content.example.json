@@ -1,0 +1,499 @@
+{
+    "format": "fmi-content",
+    "schema_version": "2.0",
+    "generator": {
+        "name": "fill-me-in"
+    },
+    "exported_at": "2026-11-05T12:00:00Z",
+    "scope": {
+        "type": "project",
+        "page_ids": [
+            "01a1ad8e-0180-7171-a4bd-712e8ff5efc0",
+            "01a1ad8e-0378-7364-9a9d-385a623df61c"
+        ]
+    },
+    "project": {
+        "id": "01a1ad8e-0175-7074-90b5-b49a3bd2f83e",
+        "name": "Przykładowy projekt",
+        "slug": "przykladowy-projekt",
+        "figma": {
+            "file_key": "AbCdEfGh12345678"
+        }
+    },
+    "summary": {
+        "pages": 2,
+        "sections": 3,
+        "fields": 16,
+        "filled": 11,
+        "empty": 6,
+        "cleared": 1,
+        "media": 4,
+        "media_links": 0,
+        "missing": 4
+    },
+    "pages": [
+        {
+            "id": "01a1ad8e-0180-7171-a4bd-712e8ff5efc0",
+            "parent_id": null,
+            "name": "Strona główna",
+            "slug": "strona-glowna",
+            "position": 1,
+            "figma": {
+                "node_id": "12:345",
+                "node_name": "Home — desktop"
+            },
+            "sections": [
+                {
+                    "id": "01a1ad8e-0382-73ee-962d-c2d1618e5848",
+                    "name": "Główna sekcja",
+                    "position": 1,
+                    "hidden": false,
+                    "figma": {
+                        "node_id": "12:400",
+                        "node_name": "Hero"
+                    },
+                    "client_note": "Prosimy o wersję nagłówka bez wykrzyknika.",
+                    "fields": [
+                        {
+                            "id": "01a1ad8e-0387-7091-9fde-3b185c727c81",
+                            "key": "naglowek",
+                            "label": "Nagłówek",
+                            "type": "text",
+                            "required": true,
+                            "hidden": false,
+                            "instructions": null,
+                            "position": 1,
+                            "settings": {
+                                "max_length": 120
+                            },
+                            "figma": {
+                                "node_id": "12:401",
+                                "text": "Tu wpisz nagłówek"
+                            },
+                            "state": "filled",
+                            "value": "Tytuł strony"
+                        },
+                        {
+                            "id": "01a1ad8e-0388-73dc-962a-7769944d8307",
+                            "key": "wstep",
+                            "label": "Wstęp",
+                            "type": "textarea",
+                            "required": false,
+                            "hidden": false,
+                            "instructions": null,
+                            "position": 2,
+                            "settings": {},
+                            "figma": null,
+                            "state": "cleared",
+                            "value": null
+                        },
+                        {
+                            "id": "01a1ad8e-038a-725c-8708-a2a09ea08aa7",
+                            "key": "opis",
+                            "label": "Opis",
+                            "type": "wysiwyg",
+                            "required": false,
+                            "hidden": false,
+                            "instructions": null,
+                            "position": 3,
+                            "settings": {},
+                            "figma": null,
+                            "state": "filled",
+                            "value": "<p>Opis <strong>projektu</strong></p>"
+                        },
+                        {
+                            "id": "01a1ad8e-038c-737f-aae9-78ed8f468357",
+                            "key": "przycisk",
+                            "label": "Przycisk",
+                            "type": "link",
+                            "required": false,
+                            "hidden": false,
+                            "instructions": null,
+                            "position": 4,
+                            "settings": {},
+                            "figma": null,
+                            "state": "filled",
+                            "value": {
+                                "label": "Kontakt",
+                                "url": "https://example.com/kontakt"
+                            }
+                        },
+                        {
+                            "id": "01a1ad8e-038e-7132-a0a2-530c16680216",
+                            "key": "zdjecie",
+                            "label": "Zdjęcie",
+                            "type": "image",
+                            "required": false,
+                            "hidden": false,
+                            "instructions": null,
+                            "position": 5,
+                            "settings": {
+                                "require_alt": 1
+                            },
+                            "figma": null,
+                            "state": "filled",
+                            "value": {
+                                "media_id": "3d8ba1d4-7fdc-425b-a7d2-30901233cb77",
+                                "path": "media/f946960b67774cc9da59f916fc659d1b9b2135ac7f0db205f610800105d9fbe8.png"
+                            },
+                            "source_link": null
+                        },
+                        {
+                            "id": "01a1ad8e-0390-72a3-ac34-6563b697bab5",
+                            "key": "galeria",
+                            "label": "Galeria",
+                            "type": "gallery",
+                            "required": false,
+                            "hidden": false,
+                            "instructions": null,
+                            "position": 6,
+                            "settings": {
+                                "min_items": 3
+                            },
+                            "figma": null,
+                            "state": "filled",
+                            "value": [
+                                {
+                                    "media_id": "24004743-b352-404d-ba19-bca8cc58427a",
+                                    "path": "media/cbb21d57df55e084a52d50fe6c9035119398b1eeeb842a92ffae480ef3ecc41c.png"
+                                },
+                                {
+                                    "media_id": "7aaca26d-3a26-499b-bb4e-e31298534165",
+                                    "path": "media/62240c77799634b389ee0118649e7ef5beb687312d1e3397d77f0ce1c231ebea.png"
+                                }
+                            ],
+                            "source_link": null
+                        },
+                        {
+                            "id": "01a1ad8e-0391-70ed-a349-fe0939220729",
+                            "key": "podtytul",
+                            "label": "Podtytuł",
+                            "type": "text",
+                            "required": true,
+                            "hidden": false,
+                            "instructions": null,
+                            "position": 7,
+                            "settings": {},
+                            "figma": null,
+                            "state": "empty",
+                            "value": null
+                        },
+                        {
+                            "id": "01a1ad8e-0393-7104-ab0d-ad696a7e1a42",
+                            "key": "notatka",
+                            "label": "Notatka",
+                            "type": "text",
+                            "required": false,
+                            "hidden": true,
+                            "instructions": null,
+                            "position": 8,
+                            "settings": {},
+                            "figma": null,
+                            "state": "empty",
+                            "value": null
+                        }
+                    ]
+                },
+                {
+                    "id": "01a1ad8e-0383-71e6-877a-b1b9541d71a6",
+                    "name": "Wartości",
+                    "position": 2,
+                    "hidden": false,
+                    "figma": null,
+                    "client_note": null,
+                    "fields": [
+                        {
+                            "id": "01a1ad8e-0398-7205-aa71-bfdb942793a7",
+                            "key": "wartosci",
+                            "label": "Wartości",
+                            "type": "group",
+                            "required": false,
+                            "hidden": false,
+                            "instructions": null,
+                            "position": 1,
+                            "settings": {},
+                            "figma": null,
+                            "state": "filled",
+                            "fields": [
+                                {
+                                    "id": "01a1ad8e-0399-7146-a136-a310f6f49e4f",
+                                    "key": "naglowek_listy",
+                                    "label": "Nagłówek listy",
+                                    "type": "text",
+                                    "required": false,
+                                    "hidden": false,
+                                    "instructions": null,
+                                    "position": 1,
+                                    "settings": {},
+                                    "figma": null,
+                                    "state": "filled",
+                                    "value": "Nasze wartości"
+                                },
+                                {
+                                    "id": "01a1ad8e-039b-7370-b360-996e49ed66bb",
+                                    "key": "lista",
+                                    "label": "Lista",
+                                    "type": "repeater",
+                                    "required": false,
+                                    "hidden": false,
+                                    "instructions": null,
+                                    "position": 2,
+                                    "settings": {},
+                                    "figma": null,
+                                    "state": "filled",
+                                    "rows": [
+                                        {
+                                            "id": "01a1ad8e-03dd-704e-a278-0c3958a31bf5",
+                                            "position": 0,
+                                            "fields": [
+                                                {
+                                                    "id": "01a1ad8e-039d-73ef-9a57-4cc0b041e556",
+                                                    "key": "tytul",
+                                                    "label": "Tytuł",
+                                                    "type": "text",
+                                                    "required": true,
+                                                    "hidden": false,
+                                                    "instructions": null,
+                                                    "position": 1,
+                                                    "settings": {},
+                                                    "figma": null,
+                                                    "state": "filled",
+                                                    "value": "Pierwsza wartość"
+                                                },
+                                                {
+                                                    "id": "01a1ad8e-039f-7110-90d2-2ed010485873",
+                                                    "key": "ikona",
+                                                    "label": "Ikona",
+                                                    "type": "image",
+                                                    "required": false,
+                                                    "hidden": false,
+                                                    "instructions": null,
+                                                    "position": 2,
+                                                    "settings": {},
+                                                    "figma": null,
+                                                    "state": "filled",
+                                                    "value": {
+                                                        "media_id": "64f4cbf6-00b1-40e8-b671-3d9c499883b9",
+                                                        "path": "media/1715eda97a5fa19c44ff9cd304d4e3d1729bac8dd3ae3701e5a5cc35d6f76512.png"
+                                                    },
+                                                    "source_link": null
+                                                },
+                                                {
+                                                    "id": "01a1ad8e-03a0-70e5-8fb3-30181018cba6",
+                                                    "key": "punkty",
+                                                    "label": "Punkty",
+                                                    "type": "repeater",
+                                                    "required": false,
+                                                    "hidden": false,
+                                                    "instructions": null,
+                                                    "position": 3,
+                                                    "settings": {},
+                                                    "figma": null,
+                                                    "state": "filled",
+                                                    "rows": [
+                                                        {
+                                                            "id": "01a1ad8e-03e9-71e7-987a-79d9d00e9055",
+                                                            "position": 0,
+                                                            "fields": [
+                                                                {
+                                                                    "id": "01a1ad8e-03a2-72c8-b76c-d92fbcf02d60",
+                                                                    "key": "punkt",
+                                                                    "label": "Punkt",
+                                                                    "type": "text",
+                                                                    "required": false,
+                                                                    "hidden": false,
+                                                                    "instructions": null,
+                                                                    "position": 1,
+                                                                    "settings": {},
+                                                                    "figma": null,
+                                                                    "state": "filled",
+                                                                    "value": "Punkt w wierszu"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "01a1ad8e-03de-71c0-9823-a0265c1586f9",
+                                            "position": 1,
+                                            "fields": [
+                                                {
+                                                    "id": "01a1ad8e-039d-73ef-9a57-4cc0b041e556",
+                                                    "key": "tytul",
+                                                    "label": "Tytuł",
+                                                    "type": "text",
+                                                    "required": true,
+                                                    "hidden": false,
+                                                    "instructions": null,
+                                                    "position": 1,
+                                                    "settings": {},
+                                                    "figma": null,
+                                                    "state": "empty",
+                                                    "value": null
+                                                },
+                                                {
+                                                    "id": "01a1ad8e-039f-7110-90d2-2ed010485873",
+                                                    "key": "ikona",
+                                                    "label": "Ikona",
+                                                    "type": "image",
+                                                    "required": false,
+                                                    "hidden": false,
+                                                    "instructions": null,
+                                                    "position": 2,
+                                                    "settings": {},
+                                                    "figma": null,
+                                                    "state": "empty",
+                                                    "value": null,
+                                                    "source_link": null
+                                                },
+                                                {
+                                                    "id": "01a1ad8e-03a0-70e5-8fb3-30181018cba6",
+                                                    "key": "punkty",
+                                                    "label": "Punkty",
+                                                    "type": "repeater",
+                                                    "required": false,
+                                                    "hidden": false,
+                                                    "instructions": null,
+                                                    "position": 3,
+                                                    "settings": {},
+                                                    "figma": null,
+                                                    "state": "empty",
+                                                    "rows": []
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "01a1ad8e-0378-7364-9a9d-385a623df61c",
+            "parent_id": "01a1ad8e-0180-7171-a4bd-712e8ff5efc0",
+            "name": "O nas",
+            "slug": "o-nas",
+            "position": 1,
+            "figma": null,
+            "sections": [
+                {
+                    "id": "01a1ad8e-0384-7301-beca-04c7b1e07fa8",
+                    "name": "Główna sekcja",
+                    "position": 1,
+                    "hidden": false,
+                    "figma": null,
+                    "client_note": null,
+                    "fields": [
+                        {
+                            "id": "01a1ad8e-03a4-7205-9b84-63c4b6ce3324",
+                            "key": "pole_z_obcym_mapowaniem",
+                            "label": "Pole z obcym mapowaniem",
+                            "type": "text",
+                            "required": false,
+                            "hidden": false,
+                            "instructions": null,
+                            "position": 1,
+                            "settings": {},
+                            "figma": null,
+                            "state": "empty",
+                            "value": null
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "media": [
+        {
+            "id": "24004743-b352-404d-ba19-bca8cc58427a",
+            "path": "media/cbb21d57df55e084a52d50fe6c9035119398b1eeeb842a92ffae480ef3ecc41c.png",
+            "file_name": "zdjecie-60.png",
+            "mime": "image/png",
+            "size": 687,
+            "width": 320,
+            "height": 200,
+            "sha256": "cbb21d57df55e084a52d50fe6c9035119398b1eeeb842a92ffae480ef3ecc41c",
+            "alt": "Pierwsze",
+            "caption": "Podpis"
+        },
+        {
+            "id": "3d8ba1d4-7fdc-425b-a7d2-30901233cb77",
+            "path": "media/f946960b67774cc9da59f916fc659d1b9b2135ac7f0db205f610800105d9fbe8.png",
+            "file_name": "zdjecie-10.png",
+            "mime": "image/png",
+            "size": 687,
+            "width": 320,
+            "height": 200,
+            "sha256": "f946960b67774cc9da59f916fc659d1b9b2135ac7f0db205f610800105d9fbe8",
+            "alt": null,
+            "caption": null
+        },
+        {
+            "id": "64f4cbf6-00b1-40e8-b671-3d9c499883b9",
+            "path": "media/1715eda97a5fa19c44ff9cd304d4e3d1729bac8dd3ae3701e5a5cc35d6f76512.png",
+            "file_name": "zdjecie-160.png",
+            "mime": "image/png",
+            "size": 687,
+            "width": 320,
+            "height": 200,
+            "sha256": "1715eda97a5fa19c44ff9cd304d4e3d1729bac8dd3ae3701e5a5cc35d6f76512",
+            "alt": null,
+            "caption": null
+        },
+        {
+            "id": "7aaca26d-3a26-499b-bb4e-e31298534165",
+            "path": "media/62240c77799634b389ee0118649e7ef5beb687312d1e3397d77f0ce1c231ebea.png",
+            "file_name": "zdjecie-110.png",
+            "mime": "image/png",
+            "size": 687,
+            "width": 320,
+            "height": 200,
+            "sha256": "62240c77799634b389ee0118649e7ef5beb687312d1e3397d77f0ce1c231ebea",
+            "alt": null,
+            "caption": null
+        }
+    ],
+    "missing": [
+        {
+            "page_id": "01a1ad8e-0180-7171-a4bd-712e8ff5efc0",
+            "page": "Strona główna",
+            "section_id": "01a1ad8e-0382-73ee-962d-c2d1618e5848",
+            "section": "Główna sekcja",
+            "field_id": "01a1ad8e-038e-7132-a0a2-530c16680216",
+            "field": "Zdjęcie",
+            "reason": "missing_alt"
+        },
+        {
+            "page_id": "01a1ad8e-0180-7171-a4bd-712e8ff5efc0",
+            "page": "Strona główna",
+            "section_id": "01a1ad8e-0382-73ee-962d-c2d1618e5848",
+            "section": "Główna sekcja",
+            "field_id": "01a1ad8e-0390-72a3-ac34-6563b697bab5",
+            "field": "Galeria",
+            "reason": "too_few"
+        },
+        {
+            "page_id": "01a1ad8e-0180-7171-a4bd-712e8ff5efc0",
+            "page": "Strona główna",
+            "section_id": "01a1ad8e-0382-73ee-962d-c2d1618e5848",
+            "section": "Główna sekcja",
+            "field_id": "01a1ad8e-0391-70ed-a349-fe0939220729",
+            "field": "Podtytuł",
+            "reason": "empty"
+        },
+        {
+            "page_id": "01a1ad8e-0180-7171-a4bd-712e8ff5efc0",
+            "page": "Strona główna",
+            "section_id": "01a1ad8e-0383-71e6-877a-b1b9541d71a6",
+            "section": "Wartości",
+            "field_id": "01a1ad8e-039d-73ef-9a57-4cc0b041e556",
+            "field": "Tytuł",
+            "row_id": "01a1ad8e-03de-71c0-9823-a0265c1586f9",
+            "reason": "empty"
+        }
+    ]
+}

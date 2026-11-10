@@ -1,0 +1,9 @@
+{
+  "err": null,
+  "images": {
+    "1:2": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/fixture-1-2",
+    "1:10": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/fixture-1-10",
+    "1:20": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/fixture-1-20",
+    "1:30": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/fixture-1-30"
+  }
+}

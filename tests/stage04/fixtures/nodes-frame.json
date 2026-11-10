@@ -1,0 +1,83 @@
+{
+  "name": "FMI Fixture — Strona firmowa",
+  "role": "viewer",
+  "lastModified": "2026-10-20T10:15:30Z",
+  "editorType": "figma",
+  "thumbnailUrl": "https://s3-alpha.figma.com/thumbnails/fixture",
+  "version": "1111111111",
+  "nodes": {
+    "1:2": {
+      "document": {
+        "id": "1:2",
+        "name": "Strona główna — desktop",
+        "type": "FRAME",
+        "visible": true,
+        "absoluteBoundingBox": { "x": 0, "y": 0, "width": 1440, "height": 3200 },
+        "fills": [{ "type": "SOLID", "color": { "r": 1, "g": 1, "b": 1, "a": 1 } }],
+        "effects": [],
+        "children": [
+          {
+            "id": "1:10",
+            "name": "Header / Nawigacja",
+            "type": "INSTANCE",
+            "absoluteBoundingBox": { "x": 0, "y": 0, "width": 1440, "height": 96 },
+            "children": [
+              { "id": "I1:10;5:1", "name": "Logo", "type": "VECTOR" }
+            ]
+          },
+          {
+            "id": "1:20",
+            "name": "Hero",
+            "type": "FRAME",
+            "absoluteBoundingBox": { "x": 0, "y": 96, "width": 1440, "height": 720 },
+            "fills": [],
+            "children": [
+              {
+                "id": "1:21",
+                "name": "Nagłówek",
+                "type": "TEXT",
+                "characters": "Świeże strony dla Twojej firmy",
+                "style": { "fontFamily": "Inter", "fontSize": 64 },
+                "absoluteBoundingBox": { "x": 120, "y": 240, "width": 800, "height": 160 }
+              },
+              {
+                "id": "1:22",
+                "name": "Kontener",
+                "type": "FRAME",
+                "children": [
+                  {
+                    "id": "1:23",
+                    "name": "Opis",
+                    "type": "TEXT",
+                    "characters": "Akapit pierwszy.\nAkapit drugi."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "1:30",
+            "name": "Oferta",
+            "type": "FRAME",
+            "absoluteBoundingBox": { "x": 0, "y": 816, "width": 1440, "height": 900 },
+            "children": []
+          },
+          {
+            "id": "1:40",
+            "name": "Szkic (ukryty)",
+            "type": "FRAME",
+            "visible": false,
+            "children": []
+          }
+        ]
+      },
+      "components": {},
+      "componentSets": {},
+      "styles": {},
+      "schemaVersion": 0
+    },
+    "9:9": {
+      "document": { "id": "9:9", "name": "Węzeł spoza żądania", "type": "FRAME", "children": [] }
+    }
+  }
+}

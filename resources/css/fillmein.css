@@ -1,0 +1,210 @@
+/*
+|--------------------------------------------------------------------------
+| Fill Me In — design system aplikacji
+|--------------------------------------------------------------------------
+|
+| Osobny punkt wejścia Vite, niezależny od design systemu strony (app.css / variables.scss).
+| Skanowane są wyłącznie widoki aplikacji, więc klasy strony i aplikacji się nie mieszają.
+|
+| Paleta jest zamknięta (`--color-*: initial`) — w widokach używaj tylko tokenów poniżej.
+|
+*/
+
+@import 'tailwindcss' source(none);
+
+@source '../views/fillmein';
+@source '../views/components/ui';
+@source '../views/errors';
+@source '../js/fillmein.js';
+@source '../js/fillmein';
+
+@theme {
+  /*--- KOLORY ---*/
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* Ink — neutralna skala interfejsu (lekko chłodna) */
+  --color-ink-50: oklch(0.985 0.002 250);
+  --color-ink-100: oklch(0.965 0.004 250);
+  --color-ink-150: oklch(0.94 0.005 250);
+  --color-ink-200: oklch(0.91 0.007 250);
+  --color-ink-300: oklch(0.84 0.01 250);
+  --color-ink-400: oklch(0.7 0.013 250);
+  --color-ink-500: oklch(0.5 0.016 250);
+  --color-ink-600: oklch(0.45 0.016 250);
+  --color-ink-700: oklch(0.36 0.016 250);
+  --color-ink-800: oklch(0.26 0.014 250);
+  --color-ink-900: oklch(0.19 0.012 250);
+  --color-ink-950: oklch(0.14 0.01 250);
+
+  /* Fresh — akcent marki (świeża limonka): wyróżnienia, postęp, stany aktywne */
+  --color-fresh-50: oklch(0.985 0.03 125);
+  --color-fresh-100: oklch(0.965 0.07 125);
+  --color-fresh-200: oklch(0.935 0.13 125);
+  --color-fresh-300: oklch(0.9 0.18 125);
+  --color-fresh-400: oklch(0.87 0.2 126);
+  --color-fresh-500: oklch(0.8 0.2 128);
+  --color-fresh-600: oklch(0.66 0.17 130);
+  --color-fresh-700: oklch(0.52 0.13 132);
+  --color-fresh-800: oklch(0.42 0.1 133);
+  --color-fresh-900: oklch(0.34 0.08 134);
+
+  /* Statusy */
+  --color-success-50: oklch(0.97 0.03 155);
+  --color-success-200: oklch(0.88 0.08 155);
+  --color-success-600: oklch(0.56 0.13 155);
+  --color-success-800: oklch(0.38 0.09 155);
+
+  --color-warning-50: oklch(0.98 0.03 85);
+  --color-warning-200: oklch(0.9 0.1 85);
+  --color-warning-600: oklch(0.66 0.15 70);
+  --color-warning-800: oklch(0.44 0.1 60);
+
+  --color-danger-50: oklch(0.97 0.02 25);
+  --color-danger-200: oklch(0.88 0.07 25);
+  --color-danger-600: oklch(0.57 0.2 27);
+  --color-danger-700: oklch(0.5 0.19 27);
+  --color-danger-800: oklch(0.4 0.14 27);
+
+  --color-info-50: oklch(0.97 0.02 250);
+  --color-info-200: oklch(0.88 0.06 250);
+  --color-info-600: oklch(0.55 0.15 255);
+  --color-info-800: oklch(0.38 0.11 258);
+
+  /*--- TYPOGRAFIA ---*/
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Skala: 12 / 13 / 14 / 16 / 20 / 24 / 32 / 40 */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 0.875rem;
+  --text-base--line-height: 1.375rem;
+  --text-md: 1rem;
+  --text-md--line-height: 1.5rem;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.5rem;
+  --text-xl--line-height: 2rem;
+  --text-2xl: 2rem;
+  --text-2xl--line-height: 2.5rem;
+  --text-3xl: 2.5rem;
+  --text-3xl--line-height: 3rem;
+
+  --tracking-tight: -0.015em;
+  --tracking-tighter: -0.025em;
+
+  /*--- PROMIENIE, CIENIE, RUCH ---*/
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-full: 9999px;
+
+  --shadow-xs: 0 1px 2px 0 oklch(0.19 0.012 250 / 0.05);
+  --shadow-sm: 0 1px 3px 0 oklch(0.19 0.012 250 / 0.07), 0 1px 2px -1px oklch(0.19 0.012 250 / 0.06);
+  --shadow-md: 0 6px 16px -4px oklch(0.19 0.012 250 / 0.1), 0 2px 4px -2px oklch(0.19 0.012 250 / 0.06);
+  --shadow-lg: 0 18px 40px -12px oklch(0.19 0.012 250 / 0.18);
+
+  --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --animate-fade-in: fade-in 240ms var(--ease-out-soft) both;
+  --animate-rise-in: rise-in 320ms var(--ease-out-soft) both;
+  --animate-spin: spin 0.8s linear infinite;
+  --animate-pulse: pulse 1.6s ease-in-out infinite;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes pulse {
+    50% { opacity: 0.45; }
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-ink-50 font-sans text-base text-ink-900 antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4 {
+    @apply tracking-tight text-ink-950;
+  }
+
+  ::selection {
+    @apply bg-fresh-200 text-ink-950;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ink-900;
+  }
+
+  [x-cloak] {
+    display: none !important;
+  }
+}
+
+/*--- EDYTOR KLIENTA ---*/
+.client-wysiwyg ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.client-wysiwyg > * + * {
+  margin-top: 0.5rem;
+}
+
+/*--- UTILITY DESIGN SYSTEMU ---*/
+
+/* Pierścień fokusu dla kontrolek formularza */
+@utility ring-focus {
+  @apply outline-none ring-4 ring-fresh-200 border-ink-900;
+}
+
+/* Kontener treści aplikacji */
+@utility app-container {
+  @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10;
+}
+
+@utility client-container {
+  @apply mx-auto w-full max-w-[100rem] px-4 sm:px-6 lg:px-10;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:has([data-editor-scope], [data-page-preview]) {
+    scroll-behavior: smooth;
+  }
+}
+
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

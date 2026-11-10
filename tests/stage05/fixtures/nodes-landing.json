@@ -1,0 +1,1759 @@
+{
+ "name": "FMI Fixture etap 05",
+ "lastModified": "2026-10-27T10:00:00Z",
+ "version": "5555555555",
+ "role": "viewer",
+ "editorType": "figma",
+ "nodes": {
+  "10:1": {
+   "document": {
+    "id": "10:1",
+    "name": "Landing — desktop",
+    "type": "FRAME",
+    "absoluteBoundingBox": {
+     "x": 0,
+     "y": 0,
+     "width": 1440,
+     "height": 4200
+    },
+    "fills": [],
+    "effects": [],
+    "children": [
+     {
+      "id": "10:900",
+      "name": "Footer",
+      "type": "FRAME",
+      "absoluteBoundingBox": {
+       "x": 0,
+       "y": 3900,
+       "width": 1440,
+       "height": 300
+      },
+      "fills": [],
+      "effects": [],
+      "children": [
+       {
+        "id": "10:901",
+        "name": "Copyright",
+        "type": "TEXT",
+        "characters": "© 2026 Firma",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 3950,
+         "width": 600,
+         "height": 40
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 400,
+         "fontSize": 18,
+         "lineHeightPx": 28,
+         "textAlignHorizontal": "LEFT",
+         "fills": [
+          {
+           "type": "SOLID"
+          }
+         ]
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {}
+       },
+       {
+        "id": "10:902",
+        "name": "Link",
+        "type": "TEXT",
+        "characters": "Polityka prywatności",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 4000,
+         "width": 600,
+         "height": 40
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 400,
+         "fontSize": 18,
+         "lineHeightPx": 28,
+         "textAlignHorizontal": "LEFT",
+         "fills": [
+          {
+           "type": "SOLID"
+          }
+         ]
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {}
+       }
+      ]
+     },
+     {
+      "id": "10:100",
+      "name": "Navbar",
+      "type": "FRAME",
+      "absoluteBoundingBox": {
+       "x": 0,
+       "y": 0,
+       "width": 1440,
+       "height": 80
+      },
+      "fills": [],
+      "effects": [],
+      "children": [
+       {
+        "id": "10:101",
+        "name": "Item",
+        "type": "TEXT",
+        "characters": "Start",
+        "absoluteBoundingBox": {
+         "x": 900,
+         "y": 30,
+         "width": 80,
+         "height": 20
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 400,
+         "fontSize": 18,
+         "lineHeightPx": 28,
+         "textAlignHorizontal": "LEFT",
+         "fills": [
+          {
+           "type": "SOLID"
+          }
+         ]
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {}
+       },
+       {
+        "id": "10:102",
+        "name": "Item",
+        "type": "TEXT",
+        "characters": "O nas",
+        "absoluteBoundingBox": {
+         "x": 1000,
+         "y": 30,
+         "width": 80,
+         "height": 20
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 400,
+         "fontSize": 18,
+         "lineHeightPx": 28,
+         "textAlignHorizontal": "LEFT",
+         "fills": [
+          {
+           "type": "SOLID"
+          }
+         ]
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {}
+       }
+      ],
+      "layoutMode": "HORIZONTAL"
+     },
+     {
+      "id": "10:150",
+      "name": "Breadcrumbs",
+      "type": "FRAME",
+      "absoluteBoundingBox": {
+       "x": 0,
+       "y": 80,
+       "width": 1440,
+       "height": 40
+      },
+      "fills": [],
+      "effects": [],
+      "children": [
+       {
+        "id": "10:151",
+        "name": "Ścieżka",
+        "type": "TEXT",
+        "characters": "Start / Oferta",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 90,
+         "width": 600,
+         "height": 40
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 400,
+         "fontSize": 18,
+         "lineHeightPx": 28,
+         "textAlignHorizontal": "LEFT",
+         "fills": [
+          {
+           "type": "SOLID"
+          }
+         ]
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {}
+       }
+      ]
+     },
+     {
+      "id": "10:200",
+      "name": "Hero",
+      "type": "FRAME",
+      "absoluteBoundingBox": {
+       "x": 0,
+       "y": 120,
+       "width": 1440,
+       "height": 700
+      },
+      "fills": [],
+      "effects": [],
+      "children": [
+       {
+        "id": "10:202",
+        "name": "Lead",
+        "type": "TEXT",
+        "characters": "To jest dłuższy tekst wprowadzający, który opisuje ofertę firmy w jednym rozbudowanym zdaniu bez podziału na wiersze, aby był polem wielowierszowym.",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 420,
+         "width": 800,
+         "height": 80
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 400,
+         "fontSize": 18,
+         "lineHeightPx": 28,
+         "textAlignHorizontal": "LEFT",
+         "fills": [
+          {
+           "type": "SOLID"
+          }
+         ]
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {}
+       },
+       {
+        "id": "10:201",
+        "name": "Tytuł",
+        "type": "TEXT",
+        "characters": "Świeże strony <script>alert(1)</script>",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 240,
+         "width": 800,
+         "height": 160
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 700,
+         "fontSize": 64,
+         "lineHeightPx": 72,
+         "textCase": "ORIGINAL"
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {}
+       },
+       {
+        "id": "10:210",
+        "name": "Button / Primary",
+        "type": "INSTANCE",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 560,
+         "width": 220,
+         "height": 56
+        },
+        "fills": [],
+        "effects": [],
+        "children": [
+         {
+          "id": "10:211",
+          "name": "Label",
+          "type": "TEXT",
+          "characters": "Umów rozmowę",
+          "absoluteBoundingBox": {
+           "x": 140,
+           "y": 576,
+           "width": 180,
+           "height": 24
+          },
+          "style": {
+           "fontFamily": "Inter",
+           "fontWeight": 400,
+           "fontSize": 18,
+           "lineHeightPx": 28,
+           "textAlignHorizontal": "LEFT",
+           "fills": [
+            {
+             "type": "SOLID"
+            }
+           ]
+          },
+          "fills": [
+           {
+            "type": "SOLID",
+            "color": {
+             "r": 0,
+             "g": 0,
+             "b": 0,
+             "a": 1
+            }
+           }
+          ],
+          "characterStyleOverrides": [],
+          "styleOverrideTable": {}
+         }
+        ],
+        "componentId": "5:1"
+       },
+       {
+        "id": "10:212",
+        "name": "Zobacz ofertę",
+        "type": "TEXT",
+        "characters": "Zobacz ofertę",
+        "absoluteBoundingBox": {
+         "x": 380,
+         "y": 576,
+         "width": 160,
+         "height": 24
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontSize": 16,
+         "hyperlink": {
+          "type": "URL",
+          "url": "https://example.com/oferta"
+         }
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {}
+       },
+       {
+        "id": "10:213",
+        "name": "Stara wersja",
+        "type": "TEXT",
+        "characters": "Ukryty tekst",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 640,
+         "width": 600,
+         "height": 40
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 400,
+         "fontSize": 18,
+         "lineHeightPx": 28,
+         "textAlignHorizontal": "LEFT",
+         "fills": [
+          {
+           "type": "SOLID"
+          }
+         ]
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {},
+        "visible": false
+       },
+       {
+        "id": "10:214",
+        "name": "Pusty",
+        "type": "TEXT",
+        "characters": "   ",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 700,
+         "width": 600,
+         "height": 40
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 400,
+         "fontSize": 18,
+         "lineHeightPx": 28,
+         "textAlignHorizontal": "LEFT",
+         "fills": [
+          {
+           "type": "SOLID"
+          }
+         ]
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {}
+       },
+       {
+        "id": "10:220",
+        "name": "Menu",
+        "type": "FRAME",
+        "absoluteBoundingBox": {
+         "x": 900,
+         "y": 140,
+         "width": 400,
+         "height": 40
+        },
+        "fills": [],
+        "effects": [],
+        "children": [
+         {
+          "id": "10:221",
+          "name": "Item",
+          "type": "TEXT",
+          "characters": "Kontakt",
+          "absoluteBoundingBox": {
+           "x": 900,
+           "y": 150,
+           "width": 80,
+           "height": 20
+          },
+          "style": {
+           "fontFamily": "Inter",
+           "fontWeight": 400,
+           "fontSize": 18,
+           "lineHeightPx": 28,
+           "textAlignHorizontal": "LEFT",
+           "fills": [
+            {
+             "type": "SOLID"
+            }
+           ]
+          },
+          "fills": [
+           {
+            "type": "SOLID",
+            "color": {
+             "r": 0,
+             "g": 0,
+             "b": 0,
+             "a": 1
+            }
+           }
+          ],
+          "characterStyleOverrides": [],
+          "styleOverrideTable": {}
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "10:300",
+      "name": "O nas",
+      "type": "FRAME",
+      "absoluteBoundingBox": {
+       "x": 0,
+       "y": 820,
+       "width": 1440,
+       "height": 700
+      },
+      "fills": [],
+      "effects": [],
+      "children": [
+       {
+        "id": "10:301",
+        "name": "Nagłówek",
+        "type": "TEXT",
+        "characters": "Kim jesteśmy",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 860,
+         "width": 600,
+         "height": 40
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 400,
+         "fontSize": 18,
+         "lineHeightPx": 28,
+         "textAlignHorizontal": "LEFT",
+         "fills": [
+          {
+           "type": "SOLID"
+          }
+         ]
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {}
+       },
+       {
+        "id": "10:302",
+        "name": "Treść",
+        "type": "TEXT",
+        "characters": "Akapit pierwszy o firmie.\n\nAkapit drugi o zespole.",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 920,
+         "width": 800,
+         "height": 120
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 400,
+         "fontSize": 18,
+         "lineHeightPx": 28,
+         "textAlignHorizontal": "LEFT",
+         "fills": [
+          {
+           "type": "SOLID"
+          }
+         ]
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {}
+       },
+       {
+        "id": "10:303",
+        "name": "Lista zalet",
+        "type": "TEXT",
+        "characters": "Szybko\nTanio\nDobrze",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 1060,
+         "width": 400,
+         "height": 90
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 400,
+         "fontSize": 18,
+         "lineHeightPx": 28,
+         "textAlignHorizontal": "LEFT",
+         "fills": [
+          {
+           "type": "SOLID"
+          }
+         ]
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {},
+        "lineTypes": [
+         "UNORDERED",
+         "UNORDERED",
+         "UNORDERED"
+        ]
+       },
+       {
+        "id": "10:304",
+        "name": "Opis z linkiem",
+        "type": "TEXT",
+        "characters": "Więcej w regulaminie.",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 1170,
+         "width": 400,
+         "height": 30
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 400,
+         "fontSize": 18,
+         "lineHeightPx": 28,
+         "textAlignHorizontal": "LEFT",
+         "fills": [
+          {
+           "type": "SOLID"
+          }
+         ]
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [
+         0,
+         0,
+         0,
+         0,
+         0,
+         0,
+         0,
+         0,
+         1,
+         1,
+         1,
+         1
+        ],
+        "styleOverrideTable": {
+         "1": {
+          "hyperlink": {
+           "type": "URL",
+           "url": "https://example.com/regulamin"
+          }
+         }
+        }
+       },
+       {
+        "id": "10:310",
+        "name": "Frame 12",
+        "type": "FRAME",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 1220,
+         "width": 600,
+         "height": 60
+        },
+        "fills": [],
+        "effects": [],
+        "children": [
+         {
+          "id": "10:311",
+          "name": "Podpis",
+          "type": "TEXT",
+          "characters": "Zespół Fill Me In",
+          "absoluteBoundingBox": {
+           "x": 120,
+           "y": 1230,
+           "width": 600,
+           "height": 40
+          },
+          "style": {
+           "fontFamily": "Inter",
+           "fontWeight": 400,
+           "fontSize": 18,
+           "lineHeightPx": 28,
+           "textAlignHorizontal": "LEFT",
+           "fills": [
+            {
+             "type": "SOLID"
+            }
+           ]
+          },
+          "fills": [
+           {
+            "type": "SOLID",
+            "color": {
+             "r": 0,
+             "g": 0,
+             "b": 0,
+             "a": 1
+            }
+           }
+          ],
+          "characterStyleOverrides": [],
+          "styleOverrideTable": {}
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "10:400",
+      "name": "Oferta",
+      "type": "FRAME",
+      "absoluteBoundingBox": {
+       "x": 0,
+       "y": 1520,
+       "width": 1440,
+       "height": 800
+      },
+      "fills": [],
+      "effects": [],
+      "children": [
+       {
+        "id": "10:401",
+        "name": "Nagłówek sekcji",
+        "type": "TEXT",
+        "characters": "Nasza oferta",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 1560,
+         "width": 600,
+         "height": 40
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 400,
+         "fontSize": 18,
+         "lineHeightPx": 28,
+         "textAlignHorizontal": "LEFT",
+         "fills": [
+          {
+           "type": "SOLID"
+          }
+         ]
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {}
+       },
+       {
+        "id": "10:405",
+        "name": "Karty",
+        "type": "FRAME",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 1700,
+         "width": 1300,
+         "height": 500
+        },
+        "fills": [],
+        "effects": [],
+        "children": [
+         {
+          "id": "10:430",
+          "name": "Karta",
+          "type": "INSTANCE",
+          "absoluteBoundingBox": {
+           "x": 960,
+           "y": 1700,
+           "width": 400,
+           "height": 500
+          },
+          "fills": [],
+          "effects": [],
+          "children": [
+           {
+            "id": "10:431",
+            "name": "Zdjęcie",
+            "type": "RECTANGLE",
+            "absoluteBoundingBox": {
+             "x": 960,
+             "y": 1700,
+             "width": 400,
+             "height": 240
+            },
+            "fills": [
+             {
+              "type": "IMAGE",
+              "imageRef": "abc"
+             }
+            ]
+           },
+           {
+            "id": "10:432",
+            "name": "Tytuł karty",
+            "type": "TEXT",
+            "characters": "Usługa C",
+            "absoluteBoundingBox": {
+             "x": 984,
+             "y": 1960,
+             "width": 352,
+             "height": 32
+            },
+            "style": {
+             "fontFamily": "Inter",
+             "fontWeight": 400,
+             "fontSize": 18,
+             "lineHeightPx": 28,
+             "textAlignHorizontal": "LEFT",
+             "fills": [
+              {
+               "type": "SOLID"
+              }
+             ]
+            },
+            "fills": [
+             {
+              "type": "SOLID",
+              "color": {
+               "r": 0,
+               "g": 0,
+               "b": 0,
+               "a": 1
+              }
+             }
+            ],
+            "characterStyleOverrides": [],
+            "styleOverrideTable": {}
+           },
+           {
+            "id": "10:433",
+            "name": "Opis karty",
+            "type": "TEXT",
+            "characters": "Opis usługi C w dwóch zdaniach. Krótko i konkretnie.",
+            "absoluteBoundingBox": {
+             "x": 984,
+             "y": 2000,
+             "width": 352,
+             "height": 80
+            },
+            "style": {
+             "fontFamily": "Inter",
+             "fontWeight": 400,
+             "fontSize": 18,
+             "lineHeightPx": 28,
+             "textAlignHorizontal": "LEFT",
+             "fills": [
+              {
+               "type": "SOLID"
+              }
+             ]
+            },
+            "fills": [
+             {
+              "type": "SOLID",
+              "color": {
+               "r": 0,
+               "g": 0,
+               "b": 0,
+               "a": 1
+              }
+             }
+            ],
+            "characterStyleOverrides": [],
+            "styleOverrideTable": {}
+           }
+          ],
+          "componentId": "7:1"
+         },
+         {
+          "id": "10:410",
+          "name": "Karta",
+          "type": "INSTANCE",
+          "absoluteBoundingBox": {
+           "x": 120,
+           "y": 1700,
+           "width": 400,
+           "height": 500
+          },
+          "fills": [],
+          "effects": [],
+          "children": [
+           {
+            "id": "10:411",
+            "name": "Zdjęcie",
+            "type": "RECTANGLE",
+            "absoluteBoundingBox": {
+             "x": 120,
+             "y": 1700,
+             "width": 400,
+             "height": 240
+            },
+            "fills": [
+             {
+              "type": "IMAGE",
+              "imageRef": "abc"
+             }
+            ]
+           },
+           {
+            "id": "10:412",
+            "name": "Tytuł karty",
+            "type": "TEXT",
+            "characters": "Usługa A",
+            "absoluteBoundingBox": {
+             "x": 144,
+             "y": 1960,
+             "width": 352,
+             "height": 32
+            },
+            "style": {
+             "fontFamily": "Inter",
+             "fontWeight": 400,
+             "fontSize": 18,
+             "lineHeightPx": 28,
+             "textAlignHorizontal": "LEFT",
+             "fills": [
+              {
+               "type": "SOLID"
+              }
+             ]
+            },
+            "fills": [
+             {
+              "type": "SOLID",
+              "color": {
+               "r": 0,
+               "g": 0,
+               "b": 0,
+               "a": 1
+              }
+             }
+            ],
+            "characterStyleOverrides": [],
+            "styleOverrideTable": {}
+           },
+           {
+            "id": "10:413",
+            "name": "Opis karty",
+            "type": "TEXT",
+            "characters": "Opis usługi A w dwóch zdaniach. Krótko i konkretnie.",
+            "absoluteBoundingBox": {
+             "x": 144,
+             "y": 2000,
+             "width": 352,
+             "height": 80
+            },
+            "style": {
+             "fontFamily": "Inter",
+             "fontWeight": 400,
+             "fontSize": 18,
+             "lineHeightPx": 28,
+             "textAlignHorizontal": "LEFT",
+             "fills": [
+              {
+               "type": "SOLID"
+              }
+             ]
+            },
+            "fills": [
+             {
+              "type": "SOLID",
+              "color": {
+               "r": 0,
+               "g": 0,
+               "b": 0,
+               "a": 1
+              }
+             }
+            ],
+            "characterStyleOverrides": [],
+            "styleOverrideTable": {}
+           }
+          ],
+          "componentId": "7:1"
+         },
+         {
+          "id": "10:420",
+          "name": "Karta",
+          "type": "INSTANCE",
+          "absoluteBoundingBox": {
+           "x": 540,
+           "y": 1700,
+           "width": 400,
+           "height": 500
+          },
+          "fills": [],
+          "effects": [],
+          "children": [
+           {
+            "id": "10:421",
+            "name": "Zdjęcie",
+            "type": "RECTANGLE",
+            "absoluteBoundingBox": {
+             "x": 540,
+             "y": 1700,
+             "width": 400,
+             "height": 240
+            },
+            "fills": [
+             {
+              "type": "IMAGE",
+              "imageRef": "abc"
+             }
+            ]
+           },
+           {
+            "id": "10:422",
+            "name": "Tytuł karty",
+            "type": "TEXT",
+            "characters": "Usługa B",
+            "absoluteBoundingBox": {
+             "x": 564,
+             "y": 1960,
+             "width": 352,
+             "height": 32
+            },
+            "style": {
+             "fontFamily": "Inter",
+             "fontWeight": 400,
+             "fontSize": 18,
+             "lineHeightPx": 28,
+             "textAlignHorizontal": "LEFT",
+             "fills": [
+              {
+               "type": "SOLID"
+              }
+             ]
+            },
+            "fills": [
+             {
+              "type": "SOLID",
+              "color": {
+               "r": 0,
+               "g": 0,
+               "b": 0,
+               "a": 1
+              }
+             }
+            ],
+            "characterStyleOverrides": [],
+            "styleOverrideTable": {}
+           },
+           {
+            "id": "10:423",
+            "name": "Opis karty",
+            "type": "TEXT",
+            "characters": "Opis usługi B w dwóch zdaniach. Krótko i konkretnie.",
+            "absoluteBoundingBox": {
+             "x": 564,
+             "y": 2000,
+             "width": 352,
+             "height": 80
+            },
+            "style": {
+             "fontFamily": "Inter",
+             "fontWeight": 400,
+             "fontSize": 18,
+             "lineHeightPx": 28,
+             "textAlignHorizontal": "LEFT",
+             "fills": [
+              {
+               "type": "SOLID"
+              }
+             ]
+            },
+            "fills": [
+             {
+              "type": "SOLID",
+              "color": {
+               "r": 0,
+               "g": 0,
+               "b": 0,
+               "a": 1
+              }
+             }
+            ],
+            "characterStyleOverrides": [],
+            "styleOverrideTable": {}
+           }
+          ],
+          "componentId": "7:1"
+         }
+        ],
+        "layoutMode": "HORIZONTAL"
+       }
+      ]
+     },
+     {
+      "id": "10:500",
+      "name": "Zespół",
+      "type": "FRAME",
+      "absoluteBoundingBox": {
+       "x": 0,
+       "y": 2320,
+       "width": 1440,
+       "height": 600
+      },
+      "fills": [],
+      "effects": [],
+      "children": [
+       {
+        "id": "10:501",
+        "name": "Nasz zespół",
+        "type": "TEXT",
+        "characters": "Nasz zespół",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 2360,
+         "width": 600,
+         "height": 40
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 400,
+         "fontSize": 18,
+         "lineHeightPx": 28,
+         "textAlignHorizontal": "LEFT",
+         "fills": [
+          {
+           "type": "SOLID"
+          }
+         ]
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {}
+       },
+       {
+        "id": "10:510",
+        "name": "Osoba 1",
+        "type": "FRAME",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 2440,
+         "width": 300,
+         "height": 300
+        },
+        "fills": [],
+        "effects": [],
+        "children": [
+         {
+          "id": "10:511",
+          "name": "Imię",
+          "type": "TEXT",
+          "characters": "Anna",
+          "absoluteBoundingBox": {
+           "x": 120,
+           "y": 2700,
+           "width": 600,
+           "height": 40
+          },
+          "style": {
+           "fontFamily": "Inter",
+           "fontWeight": 400,
+           "fontSize": 18,
+           "lineHeightPx": 28,
+           "textAlignHorizontal": "LEFT",
+           "fills": [
+            {
+             "type": "SOLID"
+            }
+           ]
+          },
+          "fills": [
+           {
+            "type": "SOLID",
+            "color": {
+             "r": 0,
+             "g": 0,
+             "b": 0,
+             "a": 1
+            }
+           }
+          ],
+          "characterStyleOverrides": [],
+          "styleOverrideTable": {}
+         },
+         {
+          "id": "10:512",
+          "name": "Rola",
+          "type": "TEXT",
+          "characters": "Projektantka",
+          "absoluteBoundingBox": {
+           "x": 120,
+           "y": 2740,
+           "width": 600,
+           "height": 40
+          },
+          "style": {
+           "fontFamily": "Inter",
+           "fontWeight": 400,
+           "fontSize": 18,
+           "lineHeightPx": 28,
+           "textAlignHorizontal": "LEFT",
+           "fills": [
+            {
+             "type": "SOLID"
+            }
+           ]
+          },
+          "fills": [
+           {
+            "type": "SOLID",
+            "color": {
+             "r": 0,
+             "g": 0,
+             "b": 0,
+             "a": 1
+            }
+           }
+          ],
+          "characterStyleOverrides": [],
+          "styleOverrideTable": {}
+         }
+        ]
+       },
+       {
+        "id": "10:520",
+        "name": "Osoba 2",
+        "type": "FRAME",
+        "absoluteBoundingBox": {
+         "x": 460,
+         "y": 2440,
+         "width": 300,
+         "height": 300
+        },
+        "fills": [],
+        "effects": [],
+        "children": [
+         {
+          "id": "10:521",
+          "name": "Imię",
+          "type": "TEXT",
+          "characters": "Jan",
+          "absoluteBoundingBox": {
+           "x": 460,
+           "y": 2700,
+           "width": 600,
+           "height": 40
+          },
+          "style": {
+           "fontFamily": "Inter",
+           "fontWeight": 400,
+           "fontSize": 18,
+           "lineHeightPx": 28,
+           "textAlignHorizontal": "LEFT",
+           "fills": [
+            {
+             "type": "SOLID"
+            }
+           ]
+          },
+          "fills": [
+           {
+            "type": "SOLID",
+            "color": {
+             "r": 0,
+             "g": 0,
+             "b": 0,
+             "a": 1
+            }
+           }
+          ],
+          "characterStyleOverrides": [],
+          "styleOverrideTable": {}
+         },
+         {
+          "id": "10:522",
+          "name": "Rola",
+          "type": "TEXT",
+          "characters": "Programista",
+          "absoluteBoundingBox": {
+           "x": 460,
+           "y": 2740,
+           "width": 600,
+           "height": 40
+          },
+          "style": {
+           "fontFamily": "Inter",
+           "fontWeight": 400,
+           "fontSize": 18,
+           "lineHeightPx": 28,
+           "textAlignHorizontal": "LEFT",
+           "fills": [
+            {
+             "type": "SOLID"
+            }
+           ]
+          },
+          "fills": [
+           {
+            "type": "SOLID",
+            "color": {
+             "r": 0,
+             "g": 0,
+             "b": 0,
+             "a": 1
+            }
+           }
+          ],
+          "characterStyleOverrides": [],
+          "styleOverrideTable": {}
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "10:600",
+      "name": "Kontakt",
+      "type": "FRAME",
+      "absoluteBoundingBox": {
+       "x": 0,
+       "y": 2920,
+       "width": 1440,
+       "height": 900
+      },
+      "fills": [],
+      "effects": [],
+      "children": [
+       {
+        "id": "10:601",
+        "name": "Nagłówek kontaktu",
+        "type": "TEXT",
+        "characters": "Napisz do nas",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 2960,
+         "width": 600,
+         "height": 40
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 400,
+         "fontSize": 18,
+         "lineHeightPx": 28,
+         "textAlignHorizontal": "LEFT",
+         "fills": [
+          {
+           "type": "SOLID"
+          }
+         ]
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {}
+       },
+       {
+        "id": "10:610",
+        "name": "Dane kontaktowe",
+        "type": "FRAME",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 3040,
+         "width": 600,
+         "height": 120
+        },
+        "fills": [],
+        "effects": [],
+        "children": [
+         {
+          "id": "10:611",
+          "name": "Telefon",
+          "type": "TEXT",
+          "characters": "+48 600 000 000",
+          "absoluteBoundingBox": {
+           "x": 120,
+           "y": 3050,
+           "width": 600,
+           "height": 40
+          },
+          "style": {
+           "fontFamily": "Inter",
+           "fontWeight": 400,
+           "fontSize": 18,
+           "lineHeightPx": 28,
+           "textAlignHorizontal": "LEFT",
+           "fills": [
+            {
+             "type": "SOLID"
+            }
+           ]
+          },
+          "fills": [
+           {
+            "type": "SOLID",
+            "color": {
+             "r": 0,
+             "g": 0,
+             "b": 0,
+             "a": 1
+            }
+           }
+          ],
+          "characterStyleOverrides": [],
+          "styleOverrideTable": {}
+         },
+         {
+          "id": "10:612",
+          "name": "E-mail",
+          "type": "TEXT",
+          "characters": "kontakt@example.com",
+          "absoluteBoundingBox": {
+           "x": 120,
+           "y": 3100,
+           "width": 600,
+           "height": 40
+          },
+          "style": {
+           "fontFamily": "Inter",
+           "fontWeight": 400,
+           "fontSize": 18,
+           "lineHeightPx": 28,
+           "textAlignHorizontal": "LEFT",
+           "fills": [
+            {
+             "type": "SOLID"
+            }
+           ]
+          },
+          "fills": [
+           {
+            "type": "SOLID",
+            "color": {
+             "r": 0,
+             "g": 0,
+             "b": 0,
+             "a": 1
+            }
+           }
+          ],
+          "characterStyleOverrides": [],
+          "styleOverrideTable": {}
+         }
+        ]
+       },
+       {
+        "id": "10:620",
+        "name": "Godziny",
+        "type": "FRAME",
+        "absoluteBoundingBox": {
+         "x": 120,
+         "y": 3200,
+         "width": 600,
+         "height": 200
+        },
+        "fills": [],
+        "effects": [],
+        "children": [
+         {
+          "id": "10:621",
+          "name": "Punkt",
+          "type": "TEXT",
+          "characters": "Pon–Pt 9–17",
+          "absoluteBoundingBox": {
+           "x": 120,
+           "y": 3210,
+           "width": 600,
+           "height": 40
+          },
+          "style": {
+           "fontFamily": "Inter",
+           "fontWeight": 400,
+           "fontSize": 18,
+           "lineHeightPx": 28,
+           "textAlignHorizontal": "LEFT",
+           "fills": [
+            {
+             "type": "SOLID"
+            }
+           ]
+          },
+          "fills": [
+           {
+            "type": "SOLID",
+            "color": {
+             "r": 0,
+             "g": 0,
+             "b": 0,
+             "a": 1
+            }
+           }
+          ],
+          "characterStyleOverrides": [],
+          "styleOverrideTable": {}
+         },
+         {
+          "id": "10:622",
+          "name": "Punkt",
+          "type": "TEXT",
+          "characters": "Sob 10–14",
+          "absoluteBoundingBox": {
+           "x": 120,
+           "y": 3250,
+           "width": 600,
+           "height": 40
+          },
+          "style": {
+           "fontFamily": "Inter",
+           "fontWeight": 400,
+           "fontSize": 18,
+           "lineHeightPx": 28,
+           "textAlignHorizontal": "LEFT",
+           "fills": [
+            {
+             "type": "SOLID"
+            }
+           ]
+          },
+          "fills": [
+           {
+            "type": "SOLID",
+            "color": {
+             "r": 0,
+             "g": 0,
+             "b": 0,
+             "a": 1
+            }
+           }
+          ],
+          "characterStyleOverrides": [],
+          "styleOverrideTable": {}
+         },
+         {
+          "id": "10:623",
+          "name": "Punkt",
+          "type": "TEXT",
+          "characters": "Nd nieczynne",
+          "absoluteBoundingBox": {
+           "x": 120,
+           "y": 3290,
+           "width": 600,
+           "height": 40
+          },
+          "style": {
+           "fontFamily": "Inter",
+           "fontWeight": 400,
+           "fontSize": 18,
+           "lineHeightPx": 28,
+           "textAlignHorizontal": "LEFT",
+           "fills": [
+            {
+             "type": "SOLID"
+            }
+           ]
+          },
+          "fills": [
+           {
+            "type": "SOLID",
+            "color": {
+             "r": 0,
+             "g": 0,
+             "b": 0,
+             "a": 1
+            }
+           }
+          ],
+          "characterStyleOverrides": [],
+          "styleOverrideTable": {}
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "10:700",
+      "name": "_Notatki projektanta",
+      "type": "FRAME",
+      "absoluteBoundingBox": {
+       "x": 1500,
+       "y": 0,
+       "width": 400,
+       "height": 400
+      },
+      "fills": [],
+      "effects": [],
+      "children": [
+       {
+        "id": "10:701",
+        "name": "Notatka",
+        "type": "TEXT",
+        "characters": "Tu nic nie importujemy",
+        "absoluteBoundingBox": {
+         "x": 1500,
+         "y": 10,
+         "width": 600,
+         "height": 40
+        },
+        "style": {
+         "fontFamily": "Inter",
+         "fontWeight": 400,
+         "fontSize": 18,
+         "lineHeightPx": 28,
+         "textAlignHorizontal": "LEFT",
+         "fills": [
+          {
+           "type": "SOLID"
+          }
+         ]
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0,
+           "a": 1
+          }
+         }
+        ],
+        "characterStyleOverrides": [],
+        "styleOverrideTable": {}
+       }
+      ]
+     },
+     {
+      "id": "10:800",
+      "name": "Grid",
+      "type": "FRAME",
+      "absoluteBoundingBox": {
+       "x": 0,
+       "y": 0,
+       "width": 1440,
+       "height": 4200
+      },
+      "fills": [],
+      "effects": [],
+      "children": []
+     },
+     {
+      "id": "10:950",
+      "name": "Export slice",
+      "type": "SLICE",
+      "absoluteBoundingBox": {
+       "x": 0,
+       "y": 0,
+       "width": 1440,
+       "height": 800
+      }
+     }
+    ]
+   },
+   "components": {},
+   "styles": {}
+  }
+ }
+}

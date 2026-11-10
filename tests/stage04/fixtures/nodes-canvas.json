@@ -1,0 +1,10 @@
+{
+  "name": "FMI Fixture — Strona firmowa",
+  "lastModified": "2026-10-20T10:15:30Z",
+  "version": "1111111111",
+  "nodes": {
+    "1:2": {
+      "document": { "id": "1:2", "name": "Page 1", "type": "CANVAS", "children": [] }
+    }
+  }
+}

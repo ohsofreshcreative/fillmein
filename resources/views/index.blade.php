@@ -1,23 +1,12 @@
-@extends('layouts.app')
+{{-- Awaryjny szablon WordPressa. W praktyce front WP przekierowuje do /app (app/setup.php). --}}
+@extends('fillmein.layouts.base')
 
-@section('content')
-  @include('partials.page-header')
-
-  @if (! have_posts())
-    <x-alert type="warning">
-      {!! __('Sorry, no results were found.', 'sage') !!}
-    </x-alert>
-
-    {!! get_search_form(false) !!}
-  @endif
-
-  @while(have_posts()) @php(the_post())
-    @includeFirst(['partials.content-' . get_post_type(), 'partials.content'])
-  @endwhile
-
-  {!! get_the_posts_navigation() !!}
-@endsection
-
-@section('sidebar')
-  @include('sections.sidebar')
+@section('body')
+  <main class="flex min-h-full flex-col items-center justify-center px-6 py-16 text-center">
+    <x-ui.logo />
+    <p class="mt-6 text-md text-ink-600">Aplikacja do zbierania treści od klientów OhSoFresh Creative.</p>
+    <div class="mt-8">
+      <x-ui.button :href="home_url('/app')">Przejdź do aplikacji</x-ui.button>
+    </div>
+  </main>
 @endsection
