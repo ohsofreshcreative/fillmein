@@ -9,6 +9,12 @@
   <meta name="referrer" content="@yield('referrer', 'same-origin')">
   <meta name="csrf-token" content="{{ rescue(fn () => csrf_token(), '', false) }}">
   <title>@hasSection('title')@yield('title') · @endif{{ 'Fill Me In' }}</title>
+  {{-- Layout nie wywołuje wp_head(), więc ikonę witryny (Ustawienia → Ogólne) wstawiamy sami. --}}
+  @if (has_site_icon())
+    <link rel="icon" href="{{ get_site_icon_url(32) }}" sizes="32x32">
+    <link rel="icon" href="{{ get_site_icon_url(192) }}" sizes="192x192">
+    <link rel="apple-touch-icon" href="{{ get_site_icon_url(180) }}">
+  @endif
   @vite(['resources/css/fillmein.css', 'resources/js/fillmein.js'])
 </head>
 <body class="h-full @yield('body-class')">
