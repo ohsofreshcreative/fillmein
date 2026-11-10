@@ -39,7 +39,7 @@ class FigmaImportController extends Controller
 			'page' => $page,
 			'plan' => $plan,
 			'planError' => $error ?? null,
-			'previews' => $plan ? $plan['frame']->previews()->whereNotNull('path')->pluck('node_id')->flip() : collect(),
+			'previews' => $plan ? $plan['frame']->previews()->downloadable()->pluck('node_id')->flip() : collect(),
 		]);
 	}
 

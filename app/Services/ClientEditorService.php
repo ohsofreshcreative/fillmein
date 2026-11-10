@@ -102,7 +102,7 @@ class ClientEditorService
 	 */
 	public function sectionPreviews(Page $page, ClientStructure $structure): Collection
 	{
-		$previews = $this->frames->frameFor($page)?->previews()->whereNotNull('path')->get()->keyBy('node_id') ?? collect();
+		$previews = $this->frames->frameFor($page)?->previews()->downloadable()->get()->keyBy('node_id') ?? collect();
 
 		return $structure->sections
 			->filter(fn (Section $section) => isset($previews[$section->figma_node_id]))

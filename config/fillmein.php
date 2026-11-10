@@ -138,6 +138,10 @@ return [
 		'preview_scale' => 1,
 		'max_previews' => 40,
 
+		// Ile sekund jedno żądanie „Pobierz z Figmy” może pobierać podglądy PNG (reszta przy pierwszym wyświetleniu).
+		// Hosting zwykle przerywa żądania po 30–60 s.
+		'preview_budget_seconds' => 12,
+
 		// Adres obrazu z /v1/images jest tymczasowy (Figma: do 30 dni). Odświeżamy go wcześniej.
 		'image_url_ttl_hours' => 24 * 14,
 

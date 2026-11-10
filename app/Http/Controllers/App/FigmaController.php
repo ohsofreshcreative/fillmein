@@ -40,6 +40,10 @@ class FigmaController extends Controller
 
 		$message = 'Pobrano frame „' . ($result['frame']->node_name ?? $result['frame']->node_id) . '” z Figmy.';
 
+		if ($result['previews_remaining'] > 0) {
+			$message .= ' Pozostałe podglądy (' . $result['previews_remaining'] . ') pobiorą się przy pierwszym wyświetleniu.';
+		}
+
 		if ($result['previews_failed'] > 0) {
 			return back()->with('error', $message . ' Nie udało się pobrać ' . $result['previews_failed'] . ' podglądów — spróbuj ponownie.');
 		}

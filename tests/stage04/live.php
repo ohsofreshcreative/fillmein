@@ -57,8 +57,15 @@ try {
 		$ok($frame->file_version !== null && $frame->fetched_at !== null, 'Wersja i czas pobrania');
 		$ok($result['previews'] >= 1 && $result['previews_failed'] === 0, 'Podglądy pobrane: ' . $result['previews'] . ', błędy: ' . $result['previews_failed']);
 
-		foreach ($frame->previews as $preview) {
-			$ok(Storage::disk('fmi')->exists($preview->path), 'Plik podglądu w prywatnym cache');
+		// Jedno żądanie pobiera podglądy w budżecie czasu (preview_budget_seconds); resztę dociągają porcje.
+		for ($i = 0; $i < 10 && $result['previews_remaining'] > 0; $i++) {
+			$result['previews_remaining'] = $service->previewBatch($page, 12)['remaining'];
+		}
+
+		$ok($result['previews_remaining'] === 0, 'Wszystkie podglądy po porcjach');
+
+		foreach ($frame->previews()->get() as $preview) {
+			$ok($preview->path && Storage::disk('fmi')->exists($preview->path), 'Plik podglądu w prywatnym cache');
 		}
 
 		fwrite(STDOUT, sprintf("        frame: %s (%s), warstw: %d, podglądów: %d\n", $frame->node_name, $frame->node_type, $frame->nodes_count, $result['previews']));

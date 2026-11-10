@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -61,6 +62,14 @@ class FigmaPreview extends Model
 		return $this->remote_url !== null
 			&& $this->remote_expires_at !== null
 			&& $this->remote_expires_at->isFuture();
+	}
+
+	/**
+	 * Podgląd z plikiem albo z adresem do pobrania — brakujący plik dociąga pierwsze wyświetlenie (ensureLocal).
+	 */
+	public function scopeDownloadable(Builder $query): Builder
+	{
+		return $query->where(fn (Builder $q) => $q->whereNotNull('path')->orWhereNotNull('remote_url'));
 	}
 
 	public function isFrame(): bool

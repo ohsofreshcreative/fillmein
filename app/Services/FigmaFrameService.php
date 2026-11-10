@@ -67,7 +67,7 @@ class FigmaFrameService
 	}
 
 	/**
-	 * @return array{frame: FigmaFrame, from_cache: bool, previews: int, previews_failed: int}
+	 * @return array{frame: FigmaFrame, from_cache: bool, previews: int, previews_failed: int, previews_remaining: int}
 	 */
 	public function fetch(Page $page, WP_User $by, bool $force = false, bool $previews = true): array
 	{
@@ -104,14 +104,14 @@ class FigmaFrameService
 	 * Z podstroną: aktualizuje jej `figma_node_name` i loguje zdarzenie na podstronie, jak dotąd.
 	 *
 	 * @param array{file_key: string, node_id: string} $target
-	 * @return array{frame: FigmaFrame, from_cache: bool, previews: int, previews_failed: int}
+	 * @return array{frame: FigmaFrame, from_cache: bool, previews: int, previews_failed: int, previews_remaining: int}
 	 */
 	public function fetchTarget(Project $project, array $target, WP_User $by, bool $force = false, ?Page $page = null, bool $previews = true): array
 	{
 		$cached = $this->frameForTarget($project, $target);
 
 		if (! $force && $cached && $cached->isFresh() && (! $previews || $this->previewsComplete($cached))) {
-			return ['frame' => $cached, 'from_cache' => true, 'previews' => 0, 'previews_failed' => 0];
+			return ['frame' => $cached, 'from_cache' => true, 'previews' => 0, 'previews_failed' => 0, 'previews_remaining' => 0];
 		}
 
 		$depth = max(1, (int) config('fillmein.figma.node_depth', 8));
@@ -162,8 +162,11 @@ class FigmaFrameService
 			return $frame;
 		});
 
-		// Bez podglądów (kolejka w tle) pliki dociąga previewBatch w kolejnych, krótkich żądaniach.
-		[$downloaded, $failed] = $previews ? $this->syncPreviews($frame) : [0, 0];
+		// Pobranie wszystkich PNG potrafi trwać ponad minutę, a hosting przerywa takie żądanie błędem 500.
+		// Pobieramy tyle, ile zmieści się w budżecie czasu; resztę dociąga pierwsze wyświetlenie (ensureLocal)
+		// albo kolejka w tle (previewBatch). Bez podglądów (kolejka) — od razu tylko wpisy.
+		$budget = max(1.0, (float) config('fillmein.figma.preview_budget_seconds', 12));
+		[$downloaded, $failed, $remaining] = $this->syncPreviews($frame, microtime(true) + $budget, ! $previews);
 
 		$this->activity->log('figma.frame_fetched', Actor::user($by), $project, $page, array_filter([
 			'page_name' => $page?->name,
@@ -174,7 +177,7 @@ class FigmaFrameService
 			'previews_failed' => $failed,
 		], fn ($value, $key) => $key !== 'page_name' || $value !== null, ARRAY_FILTER_USE_BOTH));
 
-		return ['frame' => $frame->refresh(), 'from_cache' => false, 'previews' => $downloaded, 'previews_failed' => $failed];
+		return ['frame' => $frame->refresh(), 'from_cache' => false, 'previews' => $downloaded, 'previews_failed' => $failed, 'previews_remaining' => $remaining];
 	}
 
 	/**
@@ -339,7 +342,7 @@ class FigmaFrameService
 	/**
 	 * @return array{0: int, 1: int, 2: int} [pobrane, nieudane, pozostałe po przekroczeniu terminu]
 	 */
-	private function syncPreviews(FigmaFrame $frame, ?float $deadline = null): array
+	private function syncPreviews(FigmaFrame $frame, ?float $deadline = null, bool $recordsOnly = false): array
 	{
 		$nodes = [['id' => $frame->node_id, 'name' => $frame->node_name]];
 
@@ -383,6 +386,10 @@ class FigmaFrameService
 
 		if ($pending->isEmpty()) {
 			return [0, 0, 0];
+		}
+
+		if ($recordsOnly) {
+			return [0, 0, $pending->count()];
 		}
 
 		return $this->downloadPreviews($frame, $pending, $deadline);
