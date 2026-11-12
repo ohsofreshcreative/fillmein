@@ -33,7 +33,8 @@
       $changeLabels = ['name' => 'nazwa warstwy', 'label' => 'nowa nazwa', 'order' => 'nowa kolejność', 'meta' => 'uzupełnienie danych warstwy'];
     @endphp
 
-    <div class="mt-8 grid items-start gap-6 lg:grid-cols-3">
+    <div class="mt-8 grid items-start gap-6 lg:grid-cols-3" x-data="clientLightbox">
+    @include('fillmein.client.partials.lightbox')
       <div class="flex flex-col gap-6 lg:col-span-2">
         <x-ui.alert variant="info" title="Co zmienia import">
           Podgląd porównuje frame z ostatnim importem. Wybierz zmiany, które chcesz zastosować. Pola dodane ręcznie i treść klienta zostają bez zmian.
@@ -72,22 +73,27 @@
             </x-slot:header>
 
             {{-- Podgląd obok pól, w połowie szerokości karty i przyklejony przy przewijaniu długiej listy pól.
-                 Kliknięcie otwiera pełny rozmiar w nowej karcie. --}}
+                 Kliknięcie otwiera powiększenie (lightbox jak w edytorze klienta). --}}
             <div @class(['grid gap-6', 'md:grid-cols-2' => $previews->has($proposal['node_id'])])>
               @if ($previews->has($proposal['node_id']))
                 @php
                   $previewSrc = route('fmi.projects.pages.figma.preview', [$project, $page, \App\Integrations\Figma\FigmaUrl::encodeNodeId($proposal['node_id'])]);
                 @endphp
                 <div class="md:sticky md:top-6 md:self-start">
-                  <a href="{{ $previewSrc }}" target="_blank" rel="noopener" class="block overflow-hidden rounded-lg border border-ink-150 bg-ink-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink-900">
+                  <button
+                    type="button"
+                    x-on:click="show(@js($previewSrc), @js('Podgląd sekcji ' . $proposal['name']))"
+                    class="block w-full cursor-zoom-in overflow-hidden rounded-lg border border-ink-150 bg-ink-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink-900"
+                    aria-label="Powiększ podgląd sekcji {{ $proposal['name'] }}"
+                  >
                     <img
                       src="{{ $previewSrc }}"
                       alt="Podgląd sekcji {{ $proposal['name'] }}"
                       loading="lazy"
                       class="max-h-[80vh] w-full object-contain object-top"
                     >
-                  </a>
-                  <p class="mt-2 text-sm text-ink-500">Kliknij, aby otworzyć w pełnym rozmiarze.</p>
+                  </button>
+                  <p class="mt-2 text-sm text-ink-500">Kliknij, aby powiększyć.</p>
                 </div>
               @endif
 
