@@ -175,7 +175,9 @@ final class FrameAnalyzer
 				&& (float) ($node['box']['height'] ?? 0) >= $minHeight
 				&& (count($blocks) >= 2 || array_filter($blocks, fn ($child) => (float) ($child['box']['height'] ?? 0) >= $minHeight) !== [])) {
 				$wrappers[] = (string) $node['id'];
-				array_push($result, ...$this->split(array_map(fn ($child) => [$child, $nodePath, true], $inner), $frameWidth, $level + 1, $wrappers));
+				// Dekoracje bez tekstu (wektory, poświaty, tła) nie są sekcjami — w całym frame'ie nie dawały pól.
+				$content = array_values(array_filter($inner, fn ($child) => ($child['type'] ?? '') === 'TEXT' || $this->texts($child, $nodePath) !== []));
+				array_push($result, ...$this->split(array_map(fn ($child) => [$child, $nodePath, true], $content), $frameWidth, $level + 1, $wrappers));
 			} else {
 				$result[] = [$node, $path, $fromSplit];
 			}

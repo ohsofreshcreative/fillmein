@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Integrations\Figma\FigmaClient;
 use App\Integrations\Figma\FigmaException;
 use App\Integrations\Figma\FigmaUrl;
+use App\Integrations\Figma\FrameAnalyzer;
 use App\Models\FigmaFrame;
 use App\Models\FigmaPreview;
 use App\Models\Page;
@@ -352,15 +353,7 @@ class FigmaFrameService
 	 */
 	private function syncPreviews(FigmaFrame $frame, ?float $deadline = null, bool $recordsOnly = false): array
 	{
-		$nodes = [['id' => $frame->node_id, 'name' => $frame->node_name]];
-
-		foreach ($frame->children() as $child) {
-			if (($child['visible'] ?? true) !== false && FigmaUrl::isNodeId($child['id'] ?? null)) {
-				$nodes[] = ['id' => $child['id'], 'name' => $child['name'] ?? null];
-			}
-		}
-
-		$nodes = array_slice($nodes, 0, max(1, (int) config('fillmein.figma.max_previews', 40)));
+		$nodes = $this->previewNodes($frame);
 		$wanted = array_column($nodes, 'id');
 
 		// Warstwy, których już nie ma we frame'ie: usuwamy wpis i plik cache (to nie jest treść klienta).
@@ -543,9 +536,54 @@ class FigmaFrameService
 		return mb_substr((string) $frame->file_version, 0, 58) . self::RENDER_MODE;
 	}
 
+	/**
+	 * Warstwy z podglądem: frame, jego bezpośrednie dzieci i sekcje z analizy, które leżą głębiej (wydzielone
+	 * z dużego frame'u albo spod wrappera) — bez nich takie sekcje nie miały podglądu w edytorze.
+	 *
+	 * @return array<int, array{id: string, name: ?string}>
+	 */
+	private function previewNodes(FigmaFrame $frame): array
+	{
+		$nodes = [$frame->node_id => ['id' => $frame->node_id, 'name' => $frame->node_name]];
+		$document = $frame->document;
+		$sections = is_array($document) ? (new FrameAnalyzer())->analyze($document)['sections'] : [];
+		$names = [];
+
+		$index = function (array $node) use (&$index, &$names): void {
+			$names[(string) ($node['id'] ?? '')] = $node['name'] ?? null;
+
+			foreach ((array) ($node['children'] ?? []) as $child) {
+				is_array($child) && $index($child);
+			}
+		};
+
+		is_array($document) && $index($document);
+
+		foreach ($frame->children() as $child) {
+			if (($child['visible'] ?? true) !== false && FigmaUrl::isNodeId($child['id'] ?? null)) {
+				$nodes[$child['id']] ??= ['id' => $child['id'], 'name' => $child['name'] ?? null];
+			}
+		}
+
+		foreach ($sections as $section) {
+			$id = (string) $section['node_id'];
+
+			if (FigmaUrl::isNodeId($id)) {
+				$nodes[$id] ??= ['id' => $id, 'name' => $names[$id] ?? null];
+			}
+		}
+
+		return array_slice(array_values($nodes), 0, max(1, (int) config('fillmein.figma.max_previews', 40)));
+	}
+
 	private function previewsComplete(FigmaFrame $frame): bool
 	{
 		$previews = $frame->previews()->get();
+
+		// Brak wpisu dla którejś sekcji (np. po zmianie analizy) = podglądy niekompletne → ponowne pobranie.
+		if (array_diff(array_column($this->previewNodes($frame), 'id'), $previews->pluck('node_id')->all()) !== []) {
+			return false;
+		}
 
 		return $previews->isNotEmpty() && $previews->every(
 			fn (FigmaPreview $p) => $p->file_version === self::previewVersion($frame) && $p->path && Storage::disk('fmi')->exists($p->path),
