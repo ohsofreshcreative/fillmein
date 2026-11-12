@@ -71,19 +71,27 @@
               </div>
             </x-slot:header>
 
-            <div class="flex flex-col gap-4 sm:flex-row">
+            {{-- Podgląd obok pól, w połowie szerokości karty i przyklejony przy przewijaniu długiej listy pól.
+                 Kliknięcie otwiera pełny rozmiar w nowej karcie. --}}
+            <div @class(['grid gap-6', 'md:grid-cols-2' => $previews->has($proposal['node_id'])])>
               @if ($previews->has($proposal['node_id']))
-                <div class="flex h-28 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-ink-50 sm:w-44">
-                  <img
-                    src="{{ route('fmi.projects.pages.figma.preview', [$project, $page, \App\Integrations\Figma\FigmaUrl::encodeNodeId($proposal['node_id'])]) }}"
-                    alt="Podgląd sekcji {{ $proposal['name'] }}"
-                    loading="lazy"
-                    class="max-h-28 w-auto object-contain"
-                  >
+                @php
+                  $previewSrc = route('fmi.projects.pages.figma.preview', [$project, $page, \App\Integrations\Figma\FigmaUrl::encodeNodeId($proposal['node_id'])]);
+                @endphp
+                <div class="md:sticky md:top-6 md:self-start">
+                  <a href="{{ $previewSrc }}" target="_blank" rel="noopener" class="block overflow-hidden rounded-lg border border-ink-150 bg-ink-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink-900">
+                    <img
+                      src="{{ $previewSrc }}"
+                      alt="Podgląd sekcji {{ $proposal['name'] }}"
+                      loading="lazy"
+                      class="max-h-[80vh] w-full object-contain object-top"
+                    >
+                  </a>
+                  <p class="mt-2 text-sm text-ink-500">Kliknij, aby otworzyć w pełnym rozmiarze.</p>
                 </div>
               @endif
 
-              <div class="min-w-0 flex-1">
+              <div class="min-w-0">
                 <p class="text-sm text-ink-500">
                   Warstwa „{{ $proposal['meta']['node_name'] ?? $proposal['name'] }}”
                   @if ($entry['changes'])

@@ -12,7 +12,7 @@ THEME="$(cd "$(dirname "$0")/../.." && pwd)"
 LOGS="${TMPDIR:-/tmp}/fmi-all"
 mkdir -p "$LOGS"
 
-SUITES=(lint client-ux project-bulk page-preview nav modules review-panel review-embed review-comments review-discussions review-links review-decisions notifications review-acceptance review-qa step00 stage03 stage04 stage05 stage05a stage06 stage07 stage08 stage09 stage10 stage11 stage12 site-schema figma-queue figma-oauth stage14)
+SUITES=(lint client-ux project-bulk page-preview nav modules review-panel review-embed review-comments review-discussions review-links review-decisions notifications review-acceptance review-qa step00 stage03 stage04 stage05 stage05a stage06 stage07 stage08 stage09 stage10 stage11 stage12 site-schema figma-queue client-duplicate figma-oauth stage14)
 FAILED=0
 ROWS=""
 

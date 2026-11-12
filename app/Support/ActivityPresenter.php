@@ -31,6 +31,7 @@ final class ActivityPresenter
 		'page.reordered' => 'Zmieniono kolejność podstron',
 		'page.duplicated' => 'Zduplikowano podstronę',
 		'page.duplicated_by_client' => 'Klient zduplikował podstronę',
+		'page.archived_by_client' => 'Klient usunął dodaną przez siebie podstronę',
 		'section.created' => 'Dodano sekcję',
 		'section.updated' => 'Zmieniono sekcję',
 		'section.archived' => 'Zarchiwizowano sekcję',

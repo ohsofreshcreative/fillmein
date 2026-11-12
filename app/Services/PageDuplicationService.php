@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Enums\ElementSource;
 use App\Enums\FieldType;
+use App\Enums\MappableType;
 use App\Exceptions\PageStructureException;
+use App\Models\Activity;
 use App\Models\ClientAccess;
 use App\Models\Field;
 use App\Models\FieldValue;
@@ -81,6 +83,45 @@ class PageDuplicationService
 			'with_values' => false,
 			'with_children' => false,
 		], Actor::client($access), 'page.duplicated_by_client');
+	}
+
+	/**
+	 * Czy podstronę utworzył klient tym samym linkiem (wpis `page.duplicated_by_client` w dzienniku).
+	 * Tylko takie podstrony klient może sam usunąć.
+	 */
+	public function createdByClient(Page $page, ClientAccess $access): bool
+	{
+		return Activity::query()
+			->where('event', 'page.duplicated_by_client')
+			->where('subject_type', MappableType::Page->value)
+			->where('subject_id', $page->id)
+			->where('client_access_id', $access->id)
+			->exists();
+	}
+
+	/**
+	 * Usunięcie (archiwizacja — dane zostają i pracownik może je przywrócić) podstrony dodanej przez klienta.
+	 */
+	public function archiveForClient(Page $page, ClientAccess $access): void
+	{
+		if (! $access->isActive() || (int) $access->project_id !== (int) $page->project_id || ! $this->createdByClient($page, $access)) {
+			throw new PageStructureException('Możesz usunąć tylko podstrony dodane przez siebie.', 'page_id');
+		}
+
+		if ($page->isArchived()) {
+			return;
+		}
+
+		DB::transaction(function () use ($page) {
+			Page::query()->whereIn('id', $this->pages->subtreeIds($page))->whereNull('archived_at')->update([
+				'archived_at' => now(),
+				'updated_at' => now(),
+			]);
+		});
+
+		$this->activity->log('page.archived_by_client', Actor::client($access), $page->project, $page, [
+			'page_name' => $page->name,
+		]);
 	}
 
 	/**

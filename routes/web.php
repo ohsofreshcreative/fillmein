@@ -42,6 +42,7 @@ use App\Http\Controllers\App\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordSetupController;
 use App\Http\Controllers\Client\EditorController;
+use App\Http\Controllers\Client\PageController as ClientPageController;
 use App\Http\Controllers\Client\ReviewGuestController;
 use Illuminate\Support\Facades\Route;
 
@@ -298,6 +299,8 @@ Route::middleware(['web', 'fmi.app:client', 'throttle:fmi-client', 'fmi.client',
 	->group(function () {
 		Route::get('/', [EditorController::class, 'show'])->name('editor');
 		Route::post('fields/{field}', [EditorController::class, 'save'])->whereNumber('field')->name('fields.save');
+		Route::post('pages/{page}/duplicate', [ClientPageController::class, 'duplicate'])->whereNumber('page')->name('pages.duplicate');
+		Route::post('pages/{page}/archive', [ClientPageController::class, 'archive'])->whereNumber('page')->name('pages.archive');
 		Route::post('fields/{field}/revisions/{revision}/restore', [EditorController::class, 'restore'])
 			->whereNumber(['field', 'revision'])
 			->name('fields.restore');

@@ -14,6 +14,7 @@ use App\Models\RepeaterRow;
 use App\Models\Section;
 use App\Services\AssetService;
 use App\Services\ClientEditorService;
+use App\Services\PageDuplicationService;
 use App\Support\ProjectProgress;
 use Closure;
 use Illuminate\Contracts\View\View;
@@ -36,7 +37,7 @@ class EditorController extends Controller
 {
 	use HandlesContentWrites;
 
-	public function __construct(private ClientEditorService $editor, private AssetService $assets)
+	public function __construct(private ClientEditorService $editor, private AssetService $assets, private PageDuplicationService $duplication)
 	{
 	}
 
@@ -78,6 +79,7 @@ class EditorController extends Controller
 			'notes' => $structure ? $this->editor->sectionNotes($structure) : collect(),
 			'previewUrl' => fn (Section $section) => '?podglad=' . $section->id,
 			'progress' => $progress,
+			'canRemove' => $current && $this->duplication->createdByClient($current, $this->access($request)),
 			'historyUrl' => $this->historyLink(),
 			'assetUrl' => $this->assetLink(),
 		]);

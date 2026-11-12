@@ -152,7 +152,8 @@ while IFS=$'\t' read -r ROUTE METHOD ZONE OWN FOREIGN; do
   URL="$SITE$OWN"
   case "$ZONE:$METHOD" in
     client:GET) OK=$(code "$URL"); count "$OK" '200' 'klient' ;;
-    client:POST) OK=$(as_client "$WORK/client-a" "$CSRF_CA" POST "$URL"); count "$OK" '200 403 409 422' 'klient: ścieżka istnieje' ;;
+    # Dodanie/usunięcie podstrony przez klienta to zwykły formularz: odmowa = powrót do edytora z błędem (302).
+    client:POST) OK=$(as_client "$WORK/client-a" "$CSRF_CA" POST "$URL"); case "$ROUTE" in fmi.client.pages.*) count "$OK" '302' 'klient: ścieżka istnieje' ;; *) count "$OK" '200 403 409 422' 'klient: ścieżka istnieje' ;; esac ;;
     *) continue ;;
   esac
   printf '%s\t%s\t%s\n' "$ROUTE" "$METHOD" "$OK" >> "$WORK/owner"

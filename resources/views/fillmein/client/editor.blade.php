@@ -15,6 +15,13 @@
     :description="$previews->isNotEmpty() ? 'Przy każdej sekcji widzisz jej projekt, a obok pola do uzupełnienia. Niczego nie musisz zapisywać, zmiany zachowują się same.' : 'Uzupełnij pola poniżej. Niczego nie musisz zapisywać, zmiany zachowują się same.'"
   />
 
+  @if (session('status'))
+    <x-ui.alert variant="success" dismissible class="mt-6">{{ session('status') }}</x-ui.alert>
+  @endif
+  @if (session('error'))
+    <x-ui.alert variant="danger" dismissible class="mt-6">{{ session('error') }}</x-ui.alert>
+  @endif
+
   @if (! $current)
     <x-ui.alert class="mt-8" title="Edytor jest w przygotowaniu">
       Podstrony do uzupełnienia pojawią się tu, gdy zespół OhSoFresh skończy konfigurację projektu.
@@ -34,6 +41,7 @@
       </nav>
 
       <div class="flex min-w-0 flex-col gap-6">
+        @include('fillmein.client.partials.page-actions')
         <div class="grid gap-3 sm:grid-cols-2">
           <x-ui.progress label="Cały projekt" :value="$progress['project']['percent']" :hint="\App\Support\ProjectProgress::hint($progress['project'])" data-progress-key="project" />
           @php($pageStats = $progress['pages'][$current->id] ?? ['total' => 0, 'filled' => 0, 'percent' => 0])
