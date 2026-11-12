@@ -80,7 +80,8 @@ class FigmaQueueService
 			$batch = $this->frames->previewBatch($page, self::PREVIEW_BUDGET);
 			$name = $this->frames->frameFor($page)?->node_name ?? 'frame';
 
-			if ($batch['remaining'] > 0 && $batch['downloaded'] > 0) {
+			// Porcja przerwana limitem czasu (nic nie pobrała, ale też nic nie zawiodło) — próbujemy dalej.
+			if ($batch['remaining'] > 0 && ($batch['downloaded'] > 0 || $batch['failed'] === 0)) {
 				return ['status' => 'continue', 'message' => sprintf('Pobieranie podglądów — zostało %d.', $batch['remaining'])];
 			}
 

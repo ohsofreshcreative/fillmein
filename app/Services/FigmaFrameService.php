@@ -411,7 +411,12 @@ class FigmaFrameService
 		if ($stale->isNotEmpty()) {
 			try {
 				$this->refreshUrls($frame, $stale);
-			} catch (FigmaException) {
+			} catch (FigmaException $e) {
+				// Koniec czasu żądania / limit zapytań: podglądy czekają na kolejną porcję, to nie błąd.
+				if (self::transient($e)) {
+					return [0, 0, $previews->count()];
+				}
+
 				// Metadane frame'u są już zapisane; brak podglądów raportujemy jako nieudane.
 				return [0, $previews->count(), 0];
 			}
@@ -435,6 +440,10 @@ class FigmaFrameService
 
 				continue;
 			} catch (FigmaException $e) {
+				if (self::transient($e)) {
+					return [$downloaded, $failed, $previews->count() - $done + 1];
+				}
+
 				if ($fresh || ! $this->client->isConfigured()) {
 					$failed++;
 
@@ -446,12 +455,21 @@ class FigmaFrameService
 				$this->refreshUrls($frame, collect([$preview]));
 				$this->store($frame, $preview);
 				$downloaded++;
-			} catch (FigmaException) {
+			} catch (FigmaException $e) {
+				if (self::transient($e)) {
+					return [$downloaded, $failed, $previews->count() - $done + 1];
+				}
+
 				$failed++;
 			}
 		}
 
 		return [$downloaded, $failed, 0];
+	}
+
+	private static function transient(FigmaException $e): bool
+	{
+		return in_array($e->kind, [FigmaException::TIMEOUT, FigmaException::RATE_LIMITED], true);
 	}
 
 	/**
