@@ -60,7 +60,7 @@
               </div>
               <div class="flex flex-wrap items-center gap-3">
                 @include('fillmein.projects.pages.partials.import-select', ['value' => $entry['key'], 'action' => $entry['action'], 'name' => $model?->name ?? $proposal['name']])
-                <form method="POST" action="{{ route('fmi.projects.pages.figma.rules', [$project, $page]) }}" class="shrink-0">
+                <form method="POST" action="{{ route('fmi.projects.pages.figma.rules', [$project, $page]) }}" class="shrink-0" data-keep-scroll>
                   @csrf
                   <input type="hidden" name="node" value="{{ $proposal['node_id'] }}">
                   <input type="hidden" name="action" value="exclude">
@@ -213,7 +213,7 @@
                       <p class="truncate text-xs text-ink-500">{{ $node['path'] }}</p>
                     @endif
                   </div>
-                  <form method="POST" action="{{ route('fmi.projects.pages.figma.rules', [$project, $page]) }}" class="shrink-0">
+                  <form method="POST" action="{{ route('fmi.projects.pages.figma.rules', [$project, $page]) }}" class="shrink-0" data-keep-scroll>
                     @csrf
                     <input type="hidden" name="node" value="{{ $node['node_id'] }}">
                     <input type="hidden" name="action" value="{{ $node['auto_reason'] ? 'include' : 'reset' }}">
@@ -242,7 +242,7 @@
                     <p class="truncate font-medium">{{ $node['name'] !== '' ? $node['name'] : $node['node_id'] }}</p>
                     <p class="text-sm text-ink-500">Automatycznie: {{ $node['reason_label'] }}</p>
                   </div>
-                  <form method="POST" action="{{ route('fmi.projects.pages.figma.rules', [$project, $page]) }}" class="shrink-0">
+                  <form method="POST" action="{{ route('fmi.projects.pages.figma.rules', [$project, $page]) }}" class="shrink-0" data-keep-scroll>
                     @csrf
                     <input type="hidden" name="node" value="{{ $node['node_id'] }}">
                     <input type="hidden" name="action" value="reset">

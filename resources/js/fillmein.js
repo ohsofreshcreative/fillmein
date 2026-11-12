@@ -45,4 +45,31 @@ document.addEventListener('submit', (event) => {
   });
 });
 
+/**
+ * Formularze z data-keep-scroll (np. „Pomiń” w imporcie z Figmy) po przeładowaniu wracają w to samo miejsce
+ * strony zamiast na górę. Pozycja żyje tylko do najbliższego wczytania tej samej ścieżki.
+ */
+const SCROLL_KEY = 'fmi:keep-scroll';
+
+document.addEventListener('submit', (event) => {
+  if (event.target instanceof HTMLFormElement && event.target.hasAttribute('data-keep-scroll')) {
+    try {
+      sessionStorage.setItem(SCROLL_KEY, JSON.stringify({ path: location.pathname, y: window.scrollY }));
+    } catch {
+      // Bez sessionStorage strona po prostu wczyta się od góry.
+    }
+  }
+});
+
+try {
+  const saved = JSON.parse(sessionStorage.getItem(SCROLL_KEY) ?? 'null');
+  sessionStorage.removeItem(SCROLL_KEY);
+
+  if (saved && saved.path === location.pathname) {
+    window.addEventListener('load', () => window.scrollTo({ top: saved.y, behavior: 'instant' }));
+  }
+} catch {
+  // j.w.
+}
+
 Alpine.start();

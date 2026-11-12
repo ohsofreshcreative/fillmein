@@ -50,7 +50,7 @@
 
     <div class="flex shrink-0 flex-wrap items-center gap-3">
     @include('fillmein.projects.pages.partials.import-select', ['value' => $entry['key'], 'action' => $entry['action'], 'name' => $model?->label ?? $proposal['label']])
-    <form method="POST" action="{{ route('fmi.projects.pages.figma.rules', [$project, $page]) }}" class="shrink-0">
+    <form method="POST" action="{{ route('fmi.projects.pages.figma.rules', [$project, $page]) }}" class="shrink-0" data-keep-scroll>
       @csrf
       <input type="hidden" name="node" value="{{ $proposal['node_id'] }}">
       <input type="hidden" name="action" value="exclude">
