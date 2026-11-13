@@ -52,6 +52,14 @@
           @php
             $proposal = $entry['proposal'];
             $model = $entry['model'];
+            // Sekcja wymaga decyzji, gdy ona albo któreś z jej pól się zmienia — tylko taka jest rozwinięta.
+            $pending = function (array $item) use (&$pending): bool {
+              return ! in_array($item['action'], ['unchanged', 'keep'], true) || ! empty($item['changes']) || ! empty($item['type_key'])
+                || collect($item['children'] ?? $item['fields'] ?? [])->contains(fn ($child) => $pending($child));
+            };
+            $needsDecision = $pending($entry);
+            $sectionManual = $model ? $manualFields->where('section_id', $model->id) : collect();
+            $fieldCount = collect($entry['fields'])->count() + $sectionManual->whereNull('parent_id')->count();
           @endphp
           <x-ui.card>
             <x-slot:header>
@@ -74,6 +82,11 @@
 
             {{-- Podgląd obok pól, w połowie szerokości karty i przyklejony przy przewijaniu długiej listy pól.
                  Kliknięcie otwiera powiększenie (lightbox jak w edytorze klienta). --}}
+            <details class="group" @if ($needsDecision) open @endif>
+            <summary class="cursor-pointer list-none text-sm text-ink-500 group-open:mb-4 [&::-webkit-details-marker]:hidden">
+              <span class="group-open:hidden">Bez zmian · pól: {{ $fieldCount }} · <span class="font-medium text-ink-800 underline underline-offset-2">pokaż</span></span>
+              <span class="hidden group-open:inline">{{ $needsDecision ? 'Do przejrzenia' : 'Bez zmian' }} · <span class="font-medium text-ink-800 underline underline-offset-2">zwiń</span></span>
+            </summary>
             <div @class(['grid gap-6', 'md:grid-cols-2' => $previews->has($proposal['node_id'])])>
               @if ($previews->has($proposal['node_id']))
                 @php
@@ -114,15 +127,74 @@
                       @include('fillmein.projects.pages.partials.import-field', ['entry' => $field])
                     @endforeach
                   </ul>
+                @elseif ($sectionManual->isEmpty())
+                  <p class="mt-2 text-base text-ink-600">Brak warstw tekstowych — sekcja bez pól z Figmy.</p>
+                @endif
+
+                @if ($sectionManual->whereNull('parent_id')->isNotEmpty())
+                  <ul class="mt-2 divide-y divide-ink-100 border-t border-ink-100" role="list">
+                    @foreach ($sectionManual->whereNull('parent_id') as $manual)
+                      @include('fillmein.projects.pages.partials.import-manual-field', ['field' => $manual, 'section' => $model])
+                    @endforeach
+                  </ul>
+                @endif
+
+                @if ($model && ! $model->isArchived())
+                  @include('fillmein.projects.pages.partials.import-add-field', ['section' => $model, 'parent' => null])
                 @else
-                  <p class="mt-2 text-base text-ink-600">Brak warstw tekstowych — sekcja bez pól (zdjęcia i inne pola można dodać ręcznie).</p>
+                  <p class="mt-3 text-sm text-ink-500">Własne pola dodasz tu po zastosowaniu importu tej sekcji.</p>
                 @endif
               </div>
             </div>
+            </details>
           </x-ui.card>
         @empty
           <x-ui.empty-state title="Nie znaleziono sekcji" description="Frame nie ma widocznych warstw do importu. Sprawdź wykluczenia obok." />
         @endforelse
+
+        {{-- Sekcje dodane ręcznie (poza Figmą): import ich nie zmienia; można w nich dodawać pola. --}}
+        @foreach ($plan['manual']['sections'] as $manualSection)
+          <x-ui.card id="sekcja-{{ $manualSection->id }}">
+            <x-slot:header>
+              <div class="flex min-w-0 flex-wrap items-center gap-2">
+                <h2 class="truncate text-md font-semibold">{{ $manualSection->name }}</h2>
+                <x-ui.badge variant="fresh">Dodana ręcznie</x-ui.badge>
+              </div>
+              <x-ui.button :href="route('fmi.projects.pages.sections.edit', [$project, $page, $manualSection])" variant="ghost" size="sm">
+                Edytuj<span class="sr-only"> sekcję {{ $manualSection->name }}</span>
+              </x-ui.button>
+            </x-slot:header>
+
+            @php
+              $own = $manualFields->where('section_id', $manualSection->id)->whereNull('parent_id');
+            @endphp
+            @if ($own->isNotEmpty())
+              <ul class="divide-y divide-ink-100" role="list">
+                @foreach ($own as $manual)
+                  @include('fillmein.projects.pages.partials.import-manual-field', ['field' => $manual, 'section' => $manualSection])
+                @endforeach
+              </ul>
+            @else
+              <p class="text-sm text-ink-500">Sekcja nie ma jeszcze pól.</p>
+            @endif
+            @include('fillmein.projects.pages.partials.import-add-field', ['section' => $manualSection, 'parent' => null])
+          </x-ui.card>
+        @endforeach
+
+        <x-ui.card>
+          <details @if ($errors->has('name')) open @endif data-import-add-section>
+            <summary class="cursor-pointer text-sm font-medium text-ink-800">+ Dodaj sekcję</summary>
+            <p class="mt-2 text-sm text-ink-500">Na treści, których nie ma w makiecie (np. „Dodatkowe informacje”). Import z Figmy jej nie zmieni.</p>
+            <form method="POST" action="{{ route('fmi.projects.pages.sections.store', [$project, $page]) }}" class="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end" data-keep-scroll data-loading-form>
+              @csrf
+              <input type="hidden" name="return" value="import">
+              <div class="sm:flex-1">
+                <x-ui.input name="name" id="import-new-section" label="Nazwa sekcji" required maxlength="190" />
+              </div>
+              <x-ui.button type="submit" size="sm">Dodaj sekcję</x-ui.button>
+            </form>
+          </details>
+        </x-ui.card>
 
         @if ($plan['archive'])
           <x-ui.card>

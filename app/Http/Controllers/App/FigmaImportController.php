@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\App;
 
+use App\Enums\ElementSource;
 use App\Exceptions\FigmaImportException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ApplyFigmaImportRequest;
 use App\Http\Requests\UpdateFigmaNodeRuleRequest;
+use App\Models\Field;
 use App\Models\Page;
 use App\Models\Project;
 use App\Services\FigmaImportService;
@@ -39,6 +41,14 @@ class FigmaImportController extends Controller
 			'page' => $page,
 			'plan' => $plan,
 			'planError' => $error ?? null,
+			// Pola dodane ręcznie (nie z Figmy) — pokazywane w sekcjach podglądu, z możliwością dodania kolejnych.
+			'manualFields' => Field::query()
+				->whereIn('section_id', $page->sections()->whereNull('archived_at')->select('id'))
+				->where('source', ElementSource::Manual)
+				->whereNull('archived_at')
+				->orderBy('position')
+				->orderBy('id')
+				->get(),
 			'previews' => $plan ? $plan['frame']->previews()->downloadable()->pluck('node_id')->flip() : collect(),
 		]);
 	}

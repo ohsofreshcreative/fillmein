@@ -15,25 +15,32 @@
     'meta' => 'uzupełnienie danych warstwy',
   ];
   $items = count($proposal['meta']['items'] ?? []);
+  $reason = \App\Integrations\Figma\FrameAnalyzer::TYPE_REASONS[$proposal['reason']] ?? $proposal['reason'];
+  // Grupa bez zmian to tylko nagłówek nad wciętymi polami — bez typu i opisu.
+  $plainGroup = $type === \App\Enums\FieldType::Group && in_array($entry['action'], ['unchanged', 'keep'], true) && ! $entry['changes'] && ! $entry['type_key'];
 @endphp
 
 <li class="flex flex-col gap-2 py-3">
   <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
     <div class="min-w-0">
-      <p class="flex flex-wrap items-center gap-2">
-        <span class="font-medium text-ink-950">{{ $model?->label ?? $proposal['label'] }}</span>
-        <x-ui.badge variant="muted">{{ $type->label() }}</x-ui.badge>
-        @include('fillmein.projects.pages.partials.import-action', ['action' => $entry['action']])
-      </p>
-      <p class="mt-1 text-sm text-ink-500">
-        {{ \App\Integrations\Figma\FrameAnalyzer::TYPE_REASONS[$proposal['reason']] ?? $proposal['reason'] }}
-        @if ($items > 0)
-          · elementów w Figmie: {{ $items }}
+      @if ($plainGroup)
+        <p class="text-sm font-semibold text-ink-700" title="{{ $reason }}">{{ $model?->label ?? $proposal['label'] }}</p>
+      @else
+        <p class="flex flex-wrap items-center gap-2">
+          <span class="font-medium text-ink-950">{{ $model?->label ?? $proposal['label'] }}</span>
+          {{-- Dlaczego taki typ — w podpowiedzi po najechaniu, żeby nie zaśmiecać listy. --}}
+          <x-ui.badge variant="muted" title="{{ $reason }}">{{ $type->label() }}</x-ui.badge>
+          @include('fillmein.projects.pages.partials.import-action', ['action' => $entry['action']])
+        </p>
+        @if ($items > 0 || $entry['changes'])
+          <p class="mt-1 text-sm text-ink-500">
+            {{ implode(' · ', array_filter([
+              $items > 0 ? 'elementów w Figmie: ' . $items : null,
+              $entry['changes'] ? implode(', ', array_map(fn ($change) => $changeLabels[$change] ?? $change, $entry['changes'])) : null,
+            ])) }}
+          </p>
         @endif
-        @if ($entry['changes'])
-          · {{ implode(', ', array_map(fn ($change) => $changeLabels[$change] ?? $change, $entry['changes'])) }}
-        @endif
-      </p>
+      @endif
       @if ($entry['label_kept'])
         <p class="mt-1 text-sm text-ink-600">Etykieta ustawiona przez zespół zostaje (w Figmie: {{ $proposal['label'] }}).</p>
       @endif
@@ -43,7 +50,7 @@
       @if ($entry['type_kept'])
         <p class="mt-1 text-sm text-ink-600">Typ ustawiony przez zespół zostaje (analiza proponuje: {{ $proposedType->label() }}).</p>
       @endif
-      @if (filled($proposal['figma_text']))
+      @if (filled($proposal['figma_text']) && ! $plainGroup)
         <p class="mt-1 line-clamp-2 text-sm text-ink-600">„{{ \Illuminate\Support\Str::limit($proposal['figma_text'], 160) }}”</p>
       @endif
     </div>

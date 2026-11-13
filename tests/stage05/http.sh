@@ -94,6 +94,24 @@ has "Komunikat o regule" "$RESTORED" "Warstwa zostanie uwzględniona w imporcie"
 has "Lista przywróconych ręcznie" "$RESTORED" "Przywrócone ręcznie (1)"
 has "Stopka w podglądzie jako nowe elementy (sekcja + 2 pola)" "$RESTORED" "Nowe: 3"
 has "Wykluczonych o jedną mniej" "$RESTORED" "Wykluczone warstwy (7)"
+
+echo "== Własne pola i sekcje na ekranie importu =="
+hasnt "Bez odznak „Bez zmian” przy polach" "$AFTER" '>Bez zmian</span>'
+has "Sekcje bez zmian zwinięte" "$AFTER" 'Bez zmian · pól:'
+has "Przycisk „+ Dodaj pole”" "$AFTER" 'data-import-add-field'
+has "Przycisk „+ Dodaj sekcję”" "$AFTER" 'data-import-add-section'
+SECTION=$(printf '%s' "$AFTER" | grep -o '/sections/[0-9]*/fields"' | head -1 | grep -o '[0-9]*')
+LOC=$(curl -s -o /dev/null -w '%{redirect_url}' --max-time 25 -c "$JAR" -b "$JAR" -H "Cookie: $C_ADMIN" -X POST -d "_token=$TOKEN&return=import&label=Dodatkowy+opis&type=repeater" "$SITE/app/projects/$PA/pages/$PAGE_A/sections/$SECTION/fields")
+has "Dodanie pola wraca na ekran importu" "$LOC" '/figma/import#pole-'
+MAN=$(curl -s --max-time 25 -c "$JAR" -b "$JAR" -H "Cookie: $C_ADMIN" "$IMPORT")
+has "Pole ręczne w sekcji" "$MAN" 'Dodatkowy opis'
+has "Odznaka „Dodane ręcznie”" "$MAN" 'Dodane ręcznie'
+has "Repeater: dodawanie pola środka" "$MAN" 'Dodaj pole w „Dodatkowy opis”'
+LOC=$(curl -s -o /dev/null -w '%{redirect_url}' --max-time 25 -c "$JAR" -b "$JAR" -H "Cookie: $C_ADMIN" -X POST -d "_token=$TOKEN&return=import&name=Dodatkowe+informacje" "$SITE/app/projects/$PA/pages/$PAGE_A/sections")
+has "Dodanie sekcji wraca na ekran importu" "$LOC" '/figma/import#sekcja-'
+has "Sekcja ręczna na ekranie importu" "$(curl -s --max-time 25 -c "$JAR" -b "$JAR" -H "Cookie: $C_ADMIN" "$IMPORT")" 'Dodana ręcznie'
+LOC=$(curl -s -o /dev/null -w '%{redirect_url}' --max-time 25 -c "$JAR" -b "$JAR" -H "Cookie: $C_ADMIN" -X POST -d "_token=$TOKEN&label=Bez+powrotu&type=text" "$SITE/app/projects/$PA/pages/$PAGE_A/sections/$SECTION/fields")
+has "Bez return=import — jak dotąd do struktury" "$LOC" '/structure#pole-'
 rm -f "$JAR"
 
 echo

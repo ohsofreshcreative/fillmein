@@ -108,7 +108,10 @@ class FieldController extends Controller
 
 	private function toStructure(Project $project, Page $page, string $status, ?string $anchor = null): RedirectResponse
 	{
-		$url = route('fmi.projects.pages.structure', [$project, $page]);
+		// Dodawanie z ekranu „Analiza i import pól” wraca na ten ekran (return=import), nie do struktury.
+		$url = request()->input('return') === 'import'
+			? route('fmi.projects.pages.figma.import', [$project, $page])
+			: route('fmi.projects.pages.structure', [$project, $page]);
 
 		return redirect()->to($anchor ? $url . '#' . $anchor : $url)->with('status', $status);
 	}

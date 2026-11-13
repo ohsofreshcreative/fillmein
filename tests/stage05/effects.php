@@ -19,9 +19,10 @@ $t = [Harness::class, 'test'];
 $same = [Harness::class, 'same'];
 
 $t('Jedno zatwierdzenie = 5 sekcji i 24 pola (odrzucone żądania nic nie zapisały)', function () use ($pageA, $same) {
-	$sections = Section::query()->where('page_id', $pageA);
+	// Tylko elementy z Figmy: http.sh dodaje też ręczne pole i sekcję z ekranu importu (sprawdzane osobno).
+	$sections = Section::query()->where('page_id', $pageA)->where('source', \App\Enums\ElementSource::Figma);
 	$same(5, (clone $sections)->count(), 'Sekcje podstrony A');
-	$same(24, Field::query()->whereIn('section_id', $sections->select('id'))->count(), 'Pola podstrony A');
+	$same(24, Field::query()->whereIn('section_id', $sections->select('id'))->where('source', \App\Enums\ElementSource::Figma)->count(), 'Pola podstrony A');
 });
 
 $t('Reguła przywrócenia stopki zapisana tylko dla podstrony A', function () use ($pageA, $pageB, $same) {

@@ -1,4 +1,4 @@
-{{-- Etykieta operacji w podglądzie importu z Figmy. --}}
+{{-- Etykieta operacji w podglądzie importu z Figmy. „Bez zmian” nie ma odznaki — wyróżniamy tylko to, co się zmienia. --}}
 @php
   [$variant, $text] = match ($action) {
     'create' => ['fresh', 'Nowe'],
@@ -7,7 +7,9 @@
     'archive' => ['danger', 'Do archiwum'],
     'keep' => ['neutral', 'Zachowane'],
     'skipped' => ['muted', 'Pominięte (element ręczny)'],
-    default => ['muted', 'Bez zmian'],
+    default => [null, null],
   };
 @endphp
-<x-ui.badge :variant="$variant">{{ $text }}</x-ui.badge>
+@if ($text)
+  <x-ui.badge :variant="$variant">{{ $text }}</x-ui.badge>
+@endif
