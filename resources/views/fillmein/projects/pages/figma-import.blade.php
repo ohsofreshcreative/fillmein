@@ -63,9 +63,15 @@
           @endphp
           <x-ui.card>
             <x-slot:header>
-              <div class="flex min-w-0 flex-wrap items-center gap-2">
-                <h2 class="truncate text-md font-semibold">{{ $model?->name ?? $proposal['name'] }}</h2>
-                @include('fillmein.projects.pages.partials.import-action', ['action' => $entry['action']])
+              <div class="flex min-w-0 items-center gap-3">
+                <span aria-hidden="true" class="flex size-10 shrink-0 items-center justify-center rounded-full bg-fresh-400 text-base font-semibold text-ink-950">{{ $loop->iteration }}</span>
+                <div class="min-w-0">
+                  <p class="text-sm text-ink-500">Sekcja {{ $loop->iteration }} z {{ $loop->count }}</p>
+                  <div class="flex min-w-0 flex-wrap items-center gap-2">
+                    <h2 class="truncate text-md font-semibold">{{ $model?->name ?? $proposal['name'] }}</h2>
+                    @include('fillmein.projects.pages.partials.import-action', ['action' => $entry['action']])
+                  </div>
+                </div>
               </div>
               <div class="flex flex-wrap items-center gap-3">
                 @include('fillmein.projects.pages.partials.import-select', ['value' => $entry['key'], 'action' => $entry['action'], 'name' => $model?->name ?? $proposal['name']])
@@ -99,12 +105,12 @@
                       class="max-h-[80vh] w-full object-contain object-top"
                     >
                   </button>
-                  <p class="mt-2 text-sm text-ink-500">Kliknij, aby powiększyć.</p>
+                  <p class="mt-2 text-sm text-ink-500">Tak wygląda ta sekcja w projekcie. Kliknij, aby powiększyć.</p>
                 </div>
               @endif
 
               <div class="min-w-0">
-                <p class="text-sm text-ink-500">
+                <p class="mb-3 text-xs text-ink-400">
                   Warstwa „{{ $proposal['meta']['node_name'] ?? $proposal['name'] }}”
                   @if ($entry['changes'])
                     · {{ implode(', ', array_map(fn ($change) => $changeLabels[$change] ?? $change, $entry['changes'])) }}
@@ -115,7 +121,7 @@
                 </p>
 
                 @if ($entry['fields'])
-                  <ul class="mt-2 divide-y divide-ink-100" role="list">
+                  <ul class="divide-y divide-ink-100" role="list">
                     @foreach ($entry['fields'] as $field)
                       @include('fillmein.projects.pages.partials.import-field', ['entry' => $field])
                     @endforeach

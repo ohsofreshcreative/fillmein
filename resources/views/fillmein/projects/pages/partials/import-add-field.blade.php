@@ -11,9 +11,10 @@
     ->all();
 @endphp
 
-<details class="mt-2 rounded-lg border border-dashed border-ink-200 px-3 py-2" data-import-add-field>
-  <summary class="cursor-pointer text-sm font-medium text-ink-700">
-    + {{ $parent ? 'Dodaj pole w „' . $parent->label . '”' : 'Dodaj pole' }}
+<details class="mt-3 border-t border-dashed border-ink-200 pt-3" data-import-add-field>
+  <summary class="flex cursor-pointer list-none items-center gap-2 text-sm font-medium text-ink-700 hover:text-ink-950 [&::-webkit-details-marker]:hidden">
+    <span class="flex size-6 items-center justify-center rounded-full border border-ink-300 text-base leading-none" aria-hidden="true">+</span>
+    {{ $parent ? 'Dodaj pole w „' . $parent->label . '”' : 'Dodaj pole' }}
   </summary>
   <form
     method="POST"
