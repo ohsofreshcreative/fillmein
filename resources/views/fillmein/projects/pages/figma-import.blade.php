@@ -130,6 +130,35 @@
                   <p class="mt-2 text-base text-ink-600">Brak warstw tekstowych — sekcja bez pól z Figmy.</p>
                 @endif
 
+                @php
+                  $hiddenHere = collect($excluded)->where('section_node_id', $proposal['node_id']);
+                @endphp
+                @if ($hiddenHere->isNotEmpty())
+                  {{-- Ukryte pola zostają w swojej sekcji, mocno wyszarzone, z „Pokaż”. --}}
+                  <ul class="mt-2 divide-y divide-ink-100 border-t border-ink-100" role="list" data-import-hidden>
+                    @foreach ($hiddenHere as $node)
+                      <li class="flex items-center justify-between gap-3 py-3">
+                        <div class="min-w-0 opacity-50">
+                          <p class="flex flex-wrap items-center gap-2 text-sm">
+                            <span class="font-medium text-ink-700 line-through">{{ $node['name'] !== '' ? $node['name'] : $node['node_id'] }}</span>
+                            <span class="text-xs text-ink-500">Ukryte · {{ $node['reason_label'] }}</span>
+                          </p>
+                          <div class="mt-2 h-10 rounded-lg border border-dashed border-ink-200" aria-hidden="true"></div>
+                        </div>
+                        <form method="POST" action="{{ route('fmi.projects.pages.figma.rules', [$project, $page]) }}" class="shrink-0" data-keep-scroll>
+                          @csrf
+                          <input type="hidden" name="node" value="{{ $node['node_id'] }}">
+                          <input type="hidden" name="action" value="{{ $node['auto_reason'] ? 'include' : 'reset' }}">
+                          <button type="submit" class="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-ink-700 transition hover:bg-ink-100 hover:text-ink-950" aria-label="Pokaż pole: {{ $node['name'] }}">
+                            @include('fillmein.partials.icon', ['name' => 'review', 'class' => 'size-4'])
+                            Pokaż
+                          </button>
+                        </form>
+                      </li>
+                    @endforeach
+                  </ul>
+                @endif
+
                 @if ($sectionManual->whereNull('parent_id')->isNotEmpty())
                   <ul class="mt-2 divide-y divide-ink-100 border-t border-ink-100" role="list">
                     @foreach ($sectionManual->whereNull('parent_id') as $manual)

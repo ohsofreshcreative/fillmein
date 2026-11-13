@@ -77,6 +77,8 @@ final class FrameAnalyzer
 	/**
 	 * @param array<string, string> $rules ID warstwy => FigmaNodeRule::INCLUDE|EXCLUDE
 	 */
+	private ?string $currentSection = null;
+
 	public function __construct(private array $rules = [], ?array $config = null, ?int $maxDepth = null, private array $patterns = [])
 	{
 		$this->config = $config ?? (array) config('fillmein.figma.analysis', []);
@@ -89,6 +91,7 @@ final class FrameAnalyzer
 	public function analyze(array $document): array
 	{
 		$this->excluded = [];
+		$this->currentSection = null;
 		$this->restored = [];
 		$this->textsCache = [];
 
@@ -120,6 +123,8 @@ final class FrameAnalyzer
 		$sections = [];
 
 		foreach ($candidates as [$node, $nodePath, $fromSplit]) {
+			// Wykluczenia wewnątrz sekcji znają swoją sekcję — ekran importu pokazuje je w miejscu (wyszarzone).
+			$this->currentSection = (string) $node['id'];
 			$fields = ($node['type'] ?? '') === 'TEXT'
 				? [$this->textField($node, 0, null)]
 				: $this->fields($node, 0, [...$nodePath, (string) ($node['name'] ?? '')]);
@@ -132,6 +137,8 @@ final class FrameAnalyzer
 				'fields' => $this->positioned($fields),
 			];
 		}
+
+		$this->currentSection = null;
 
 		return [
 			'frame' => ['node_id' => (string) ($document['id'] ?? ''), 'name' => (string) ($document['name'] ?? '')],
@@ -579,6 +586,7 @@ final class FrameAnalyzer
 			'auto_reason' => $auto,
 			'path' => implode(' › ', array_filter(array_slice($path, 1), fn ($part) => $part !== '')),
 			'texts' => $texts,
+			'section_node_id' => $this->currentSection,
 		];
 	}
 
