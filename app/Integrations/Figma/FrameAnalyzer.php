@@ -225,6 +225,8 @@ final class FrameAnalyzer
 			}
 
 			if (empty($child['children']) || $this->texts($child, $path) === []) {
+				// Kontener, w którym wszystkie teksty ukryto, nie daje pól — ale jego wykluczenia mają trafić na listę.
+				$this->collectExcluded($child, $childPath);
 				$media = $this->mediaField($child, $container, $children);
 
 				if ($media !== null) {
@@ -278,6 +280,15 @@ final class FrameAnalyzer
 		}
 
 		return $out;
+	}
+
+	private function collectExcluded(array $node, array $path): void
+	{
+		foreach ($this->included($node, $path) as $child) {
+			if (! empty($child['children'])) {
+				$this->collectExcluded($child, [...$path, (string) ($child['name'] ?? '')]);
+			}
+		}
 	}
 
 	/**
@@ -588,6 +599,9 @@ final class FrameAnalyzer
 			'texts' => $texts,
 			'section_node_id' => $this->currentSection,
 		];
+
+		// Ta sama warstwa bywa zapisana wcześniej (np. przy rozbijaniu frame'u, gdy sekcja jeszcze nie jest znana).
+		$list[$id]['section_node_id'] ??= $this->currentSection;
 	}
 
 	/**

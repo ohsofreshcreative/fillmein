@@ -126,7 +126,7 @@
                       @include('fillmein.projects.pages.partials.import-field', ['entry' => $field])
                     @endforeach
                   </ul>
-                @elseif ($sectionManual->isEmpty())
+                @elseif ($sectionManual->isEmpty() && collect($excluded)->where('section_node_id', $proposal['node_id'])->isEmpty())
                   <p class="mt-2 text-base text-ink-600">Brak warstw tekstowych — sekcja bez pól z Figmy.</p>
                 @endif
 
