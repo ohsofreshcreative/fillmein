@@ -12,14 +12,17 @@
     'require_alt' => ['label' => 'Wymagaj tekstu alternatywnego', 'type' => 'checkbox'],
   ];
   $title = $field ? 'Pole: ' . $field->label : 'Nowe pole';
+  // Wejście z ekranu importu (return=import): zapis i „Anuluj” wracają na ten ekran.
+  $fromImport = request()->input('return') === 'import';
+  $backUrl = $fromImport ? route('fmi.projects.pages.figma.import', [$project, $page]) . ($field ? '#pole-' . $field->id : '') : route('fmi.projects.pages.structure', [$project, $page]);
 @endphp
 
 @section('title', $title)
 
 @section('content')
-  <a href="{{ route('fmi.projects.pages.structure', [$project, $page]) }}" class="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-ink-500 transition hover:text-ink-950">
+  <a href="{{ $backUrl }}" class="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-ink-500 transition hover:text-ink-950">
     @include('fillmein.partials.icon', ['name' => 'arrow-left', 'class' => 'size-4'])
-    Sekcje i pola
+    {{ $fromImport ? 'Analiza i import pól' : 'Sekcje i pola' }}
   </a>
 
   <x-ui.page-header :eyebrow="'Sekcja: ' . $section->name" :title="$title" :description="$parent ? 'Pole podrzędne: ' . $parent->label : null" />
@@ -32,6 +35,9 @@
     data-loading-form
   >
     @csrf
+    @if ($fromImport)
+      <input type="hidden" name="return" value="import">
+    @endif
     @if (! $field && $parent)
       <input type="hidden" name="parent_id" value="{{ $parent->id }}">
     @endif
@@ -87,7 +93,7 @@
 
       <x-slot:footer>
         <div class="flex justify-end gap-2">
-          <x-ui.button :href="route('fmi.projects.pages.structure', [$project, $page])" variant="secondary">Anuluj</x-ui.button>
+          <x-ui.button :href="$backUrl" variant="secondary">Anuluj</x-ui.button>
           <x-ui.button type="submit">{{ $field ? 'Zapisz pole' : 'Dodaj pole' }}</x-ui.button>
         </div>
       </x-slot:footer>

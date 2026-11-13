@@ -72,4 +72,42 @@ try {
   // j.w.
 }
 
+/**
+ * Rozwinięte/zwinięte <details data-remember-open="klucz"> (sekcje ekranu importu) pamiętamy w karcie przeglądarki,
+ * więc zapis pola czy „Pomiń” nie zwija ich po przeładowaniu. Sekcja z celem kotwicy (#pole-…) zawsze się rozwija.
+ */
+const OPEN_KEY = `fmi:open:${location.pathname}`;
+
+document.addEventListener('DOMContentLoaded', () => {
+  let state = {};
+
+  try {
+    state = JSON.parse(sessionStorage.getItem(OPEN_KEY) ?? '{}') ?? {};
+  } catch {
+    state = {};
+  }
+
+  document.querySelectorAll('details[data-remember-open]').forEach((details) => {
+    const key = details.dataset.rememberOpen;
+
+    if (key in state) {
+      details.open = state[key];
+    }
+
+    details.addEventListener('toggle', () => {
+      state[key] = details.open;
+
+      try {
+        sessionStorage.setItem(OPEN_KEY, JSON.stringify(state));
+      } catch {
+        // bez sessionStorage stan nie przetrwa przeładowania
+      }
+    });
+  });
+
+  const target = location.hash ? document.getElementById(location.hash.slice(1)) : null;
+  target?.closest('details[data-remember-open]')?.setAttribute('open', '');
+  target?.scrollIntoView({ block: 'center' });
+});
+
 Alpine.start();

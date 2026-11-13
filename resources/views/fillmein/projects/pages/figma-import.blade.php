@@ -69,23 +69,16 @@
               </div>
               <div class="flex flex-wrap items-center gap-3">
                 @include('fillmein.projects.pages.partials.import-select', ['value' => $entry['key'], 'action' => $entry['action'], 'name' => $model?->name ?? $proposal['name']])
-                <form method="POST" action="{{ route('fmi.projects.pages.figma.rules', [$project, $page]) }}" class="shrink-0" data-keep-scroll>
-                  @csrf
-                  <input type="hidden" name="node" value="{{ $proposal['node_id'] }}">
-                  <input type="hidden" name="action" value="exclude">
-                  <x-ui.button type="submit" variant="ghost" size="sm">
-                    Pomiń sekcję<span class="sr-only"> {{ $model?->name ?? $proposal['name'] }}</span>
-                  </x-ui.button>
-                </form>
               </div>
             </x-slot:header>
 
             {{-- Podgląd obok pól, w połowie szerokości karty i przyklejony przy przewijaniu długiej listy pól.
                  Kliknięcie otwiera powiększenie (lightbox jak w edytorze klienta). --}}
-            <details class="group" @if ($needsDecision) open @endif>
-            <summary class="cursor-pointer list-none text-sm text-ink-500 group-open:mb-4 [&::-webkit-details-marker]:hidden">
-              <span class="group-open:hidden">Bez zmian · pól: {{ $fieldCount }} · <span class="font-medium text-ink-800 underline underline-offset-2">pokaż</span></span>
-              <span class="hidden group-open:inline">{{ $needsDecision ? 'Do przejrzenia' : 'Bez zmian' }} · <span class="font-medium text-ink-800 underline underline-offset-2">zwiń</span></span>
+            <details class="group" data-remember-open="{{ $proposal['node_id'] }}" @if ($needsDecision) open @endif>
+            <summary class="flex cursor-pointer list-none items-center gap-2 rounded-lg bg-ink-50 px-3 py-2 text-sm text-ink-600 transition hover:bg-ink-100 group-open:mb-4 [&::-webkit-details-marker]:hidden">
+              <span class="inline-block transition group-open:rotate-90" aria-hidden="true">▸</span>
+              <span class="group-open:hidden">{{ $needsDecision ? 'Do przejrzenia' : 'Bez zmian' }} · pól: {{ $fieldCount }} · <span class="font-medium text-ink-900">pokaż pola</span></span>
+              <span class="hidden group-open:inline">{{ $needsDecision ? 'Do przejrzenia' : 'Bez zmian' }} · <span class="font-medium text-ink-900">zwiń</span></span>
             </summary>
             <div @class(['grid gap-6', 'md:grid-cols-2' => $previews->has($proposal['node_id'])])>
               @if ($previews->has($proposal['node_id']))
@@ -144,6 +137,14 @@
                 @else
                   <p class="mt-3 text-sm text-ink-500">Własne pola dodasz tu po zastosowaniu importu tej sekcji.</p>
                 @endif
+                <form method="POST" action="{{ route('fmi.projects.pages.figma.rules', [$project, $page]) }}" class="mt-4 border-t border-ink-100 pt-3" data-keep-scroll>
+                  @csrf
+                  <input type="hidden" name="node" value="{{ $proposal['node_id'] }}">
+                  <input type="hidden" name="action" value="exclude">
+                  <x-ui.button type="submit" variant="secondary" size="sm">
+                    Pomiń całą sekcję w imporcie<span class="sr-only"> {{ $model?->name ?? $proposal['name'] }}</span>
+                  </x-ui.button>
+                </form>
               </div>
             </div>
             </details>

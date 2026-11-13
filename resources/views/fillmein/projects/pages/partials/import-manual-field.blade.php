@@ -10,9 +10,22 @@
       <x-ui.badge variant="muted">{{ $field->type->label() }}</x-ui.badge>
       <x-ui.badge variant="fresh">Dodane ręcznie</x-ui.badge>
     </p>
-    <x-ui.button :href="route('fmi.projects.pages.fields.edit', [$project, $page, $field])" variant="ghost" size="sm">
-      Edytuj<span class="sr-only"> pole {{ $field->label }}</span>
-    </x-ui.button>
+    <span class="flex shrink-0 items-center gap-1">
+      <x-ui.button :href="route('fmi.projects.pages.fields.edit', [$project, $page, $field, 'return' => 'import'])" variant="ghost" size="sm">
+        Edytuj<span class="sr-only"> pole {{ $field->label }}</span>
+      </x-ui.button>
+      <x-ui.confirm
+        :action="route('fmi.projects.pages.fields.archive', [$project, $page, $field, 'return' => 'import'])"
+        title="Usunąć pole?"
+        confirm="Usuń"
+        trigger="Usuń"
+        trigger-variant="ghost"
+        trigger-size="sm"
+        :aria-label="'Usuń pole: ' . $field->label"
+      >
+        Pole „{{ $field->label }}” @if ($field->type->isContainer()) i jego pola podrzędne znikną @else zniknie @endif z edytora klienta (trafia do archiwum — można je przywrócić w „Sekcje i pola”).
+      </x-ui.confirm>
+    </span>
   </div>
 
   @if ($field->type->isContainer())
