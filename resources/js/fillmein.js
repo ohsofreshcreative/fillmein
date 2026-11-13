@@ -52,7 +52,8 @@ document.addEventListener('submit', (event) => {
 const SCROLL_KEY = 'fmi:keep-scroll';
 
 document.addEventListener('submit', (event) => {
-  if (event.target instanceof HTMLFormElement && event.target.hasAttribute('data-keep-scroll')) {
+  // Formularze z ekranu importu (np. „Usuń” w oknie potwierdzenia) mają w adresie return=import.
+  if (event.target instanceof HTMLFormElement && (event.target.hasAttribute('data-keep-scroll') || event.target.action.includes('return=import'))) {
     try {
       sessionStorage.setItem(SCROLL_KEY, JSON.stringify({ path: location.pathname, y: window.scrollY }));
     } catch {
