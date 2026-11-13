@@ -67,7 +67,12 @@ class FieldController extends Controller
 
 		$this->sections->archiveField($field, Staff::current());
 
-		return $this->toStructure($project, $page, 'Pole „' . $field->label . '” zostało zarchiwizowane.');
+		$response = $this->toStructure($project, $page, 'Pole „' . $field->label . '” zostało usunięte.');
+
+		// Na ekranie importu komunikat ma „Cofnij” (przywrócenie pola).
+		return request()->input('return') === 'import'
+			? $response->with('undo', ['url' => route('fmi.projects.pages.fields.restore', [$project, $page, $field, 'return' => 'import']), 'fields' => []])
+			: $response;
 	}
 
 	public function restore(Project $project, Page $page, Field $field): RedirectResponse

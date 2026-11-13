@@ -75,6 +75,9 @@ class FigmaImportController extends Controller
 
 	public function rule(UpdateFigmaNodeRuleRequest $request, Project $project, Page $page): RedirectResponse
 	{
+		// Poprzedni stan reguły — do przycisku „Cofnij” w komunikacie.
+		$previous = \App\Models\FigmaNodeRule::query()->where('page_id', $page->id)->where('node_id', $request->node())->value('action');
+
 		try {
 			$this->import->setRule($page, $request->node(), $request->action(), Staff::current());
 		} catch (FigmaImportException $e) {
@@ -89,6 +92,10 @@ class FigmaImportController extends Controller
 
 		return redirect()
 			->route('fmi.projects.pages.figma.import', [$project, $page])
-			->with('status', $message . ' Sprawdź podgląd i zatwierdź import.');
+			->with('status', $message . ' Sprawdź podgląd i zatwierdź import.')
+			->with('undo', [
+				'url' => route('fmi.projects.pages.figma.rules', [$project, $page]),
+				'fields' => ['node' => $request->node(), 'action' => $previous instanceof \BackedEnum ? $previous->value : ($previous ?? 'reset')],
+			]);
 	}
 }

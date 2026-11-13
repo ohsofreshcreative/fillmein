@@ -85,7 +85,30 @@
 
     <main id="main" class="min-w-0 flex-1">
       <div class="app-container py-8 lg:py-12">
-        @if (session('status'))
+        @if (session('status') && request()->routeIs('fmi.projects.pages.figma.import'))
+          {{-- Ekran importu: komunikat jako dymek w rogu (nie przesuwa treści), z opcjonalnym „Cofnij”. --}}
+          <div
+            x-data="{ open: true }"
+            x-init="setTimeout(() => open = false, 10000)"
+            x-show="open"
+            x-transition.opacity
+            role="status"
+            class="fixed right-4 bottom-4 z-50 flex max-w-sm animate-rise-in items-center gap-3 rounded-xl bg-ink-950 px-4 py-3 text-sm text-white shadow-lg"
+            data-import-toast
+          >
+            <span class="min-w-0 flex-1">{{ session('status') }}</span>
+            @if (session('undo'))
+              <form method="POST" action="{{ session('undo')['url'] }}" data-keep-scroll data-loading-form class="shrink-0">
+                @csrf
+                @foreach (session('undo')['fields'] as $undoName => $undoValue)
+                  <input type="hidden" name="{{ $undoName }}" value="{{ $undoValue }}">
+                @endforeach
+                <button type="submit" class="rounded-md px-2 py-1 font-semibold text-fresh-300 hover:bg-white/10">Cofnij</button>
+              </form>
+            @endif
+            <button type="button" x-on:click="open = false" class="shrink-0 rounded-md px-1 opacity-70 hover:opacity-100" aria-label="Zamknij komunikat">✕</button>
+          </div>
+        @elseif (session('status'))
           <x-ui.alert variant="success" dismissible class="mb-6">{{ session('status') }}</x-ui.alert>
         @endif
 
