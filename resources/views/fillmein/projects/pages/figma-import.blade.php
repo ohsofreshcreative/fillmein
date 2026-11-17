@@ -48,7 +48,20 @@
           </x-ui.alert>
         @endif
 
+        @php
+          // Sekcje pominięte ręcznie pokazujemy w kolejności z frame'u (wg pozycji Y), między pozostałymi.
+          $hiddenSections = collect($excluded)->whereNull('section_node_id')->where('reason', 'manual')->sortBy('y')->values();
+          $shownHidden = [];
+        @endphp
         @forelse ($plan['sections'] as $entry)
+          @php
+            $sectionY = $entry['proposal']['meta']['box']['y'] ?? INF;
+            $before = $hiddenSections->filter(fn ($node) => ! in_array($node['node_id'], $shownHidden, true) && ($node['y'] ?? INF) < $sectionY);
+            $shownHidden = array_merge($shownHidden, $before->pluck('node_id')->all());
+          @endphp
+          @foreach ($before as $node)
+            @include('fillmein.projects.pages.partials.import-hidden-section', ['node' => $node])
+          @endforeach
           @php
             $proposal = $entry['proposal'];
             $model = $entry['model'];
@@ -187,6 +200,10 @@
         @empty
           <x-ui.empty-state title="Nie znaleziono sekcji" description="Frame nie ma widocznych warstw do importu. Sprawdź wykluczenia obok." />
         @endforelse
+
+        @foreach ($hiddenSections->reject(fn ($node) => in_array($node['node_id'], $shownHidden, true)) as $node)
+          @include('fillmein.projects.pages.partials.import-hidden-section', ['node' => $node])
+        @endforeach
 
         {{-- Sekcje dodane ręcznie (poza Figmą): import ich nie zmienia; można w nich dodawać pola. --}}
         @foreach ($plan['manual']['sections'] as $manualSection)

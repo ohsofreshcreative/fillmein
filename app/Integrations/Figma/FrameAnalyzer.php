@@ -598,6 +598,7 @@ final class FrameAnalyzer
 			'path' => implode(' › ', array_filter(array_slice($path, 1), fn ($part) => $part !== '')),
 			'texts' => $texts,
 			'section_node_id' => $this->currentSection,
+			'y' => isset($node['box']['y']) ? (float) $node['box']['y'] : null,
 		];
 
 		// Ta sama warstwa bywa zapisana wcześniej (np. przy rozbijaniu frame'u, gdy sekcja jeszcze nie jest znana).

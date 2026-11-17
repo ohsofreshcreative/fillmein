@@ -4,7 +4,12 @@
 @section('container', 'client-container')
 
 @section('header-meta')
-  <p class="truncate text-sm font-medium text-ink-900">{{ $project->name }}</p>
+  <div class="flex items-center justify-end gap-3">
+    <p class="truncate text-sm font-medium text-ink-900">{{ $project->name }}</p>
+    @if ($current)
+      <x-ui.button type="button" variant="secondary" size="sm" x-data x-on:click="$dispatch('fmi-tour')">Samouczek</x-ui.button>
+    @endif
+  </div>
 @endsection
 
 @section('content')
@@ -54,5 +59,8 @@
   @endif
 
   @include('fillmein.client.partials.lightbox')
+  @if ($current)
+    @include('fillmein.client.partials.tour')
+  @endif
   </div>
 @endsection

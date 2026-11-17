@@ -3,6 +3,7 @@
 
 import Alpine from 'alpinejs';
 import { clientField, clientHistory, clientLightbox, clientMedia, clientRepeater, clientSectionNote, clientWysiwyg, saveStatus } from './fillmein/client-editor.js';
+import { clientTour } from './fillmein/client-tour.js';
 import { exportScope } from './fillmein/export-scope.js';
 import { figmaEmbed } from './fillmein/figma-embed.js';
 import { figmaQueue } from './fillmein/figma-queue.js';
@@ -25,6 +26,7 @@ Alpine.data('clientHistory', clientHistory);
 Alpine.data('clientLightbox', clientLightbox);
 Alpine.data('clientMedia', clientMedia);
 Alpine.data('clientSectionNote', clientSectionNote);
+Alpine.data('clientTour', clientTour);
 Alpine.store('saveStatus', saveStatus);
 
 /**
