@@ -7,7 +7,7 @@
   <div class="flex items-center justify-end gap-3">
     <p class="truncate text-sm font-medium text-ink-900">{{ $project->name }}</p>
     @if ($current)
-      <x-ui.button type="button" variant="secondary" size="sm" x-data x-on:click="$dispatch('fmi-tour')">Samouczek</x-ui.button>
+      <x-ui.button type="button" variant="fresh" size="sm" x-data x-on:click="$dispatch('fmi-tour')">Samouczek</x-ui.button>
     @endif
   </div>
 @endsection
