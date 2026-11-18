@@ -5,7 +5,7 @@
       {{-- Przyciemnienie z „okienkiem” na pokazywanym elemencie (duży cień wokół ramki). --}}
       <div
         x-show="hole"
-        class="pointer-events-none fixed rounded-xl ring-2 ring-fresh-400 shadow-[0_0_0_9999px_color-mix(in_oklab,var(--color-ink-950)_55%,transparent)] transition-all duration-300"
+        class="pointer-events-none fixed rounded-xl ring-2 ring-fresh-400 shadow-[0_0_0_9999px_color-mix(in_oklab,var(--color-ink-950)_55%,transparent)]"
         :style="hole && `top:${hole.top}px;left:${hole.left}px;width:${hole.width}px;height:${hole.height}px`"
       ></div>
       <div x-show="! hole" class="fixed inset-0 bg-ink-950/55"></div>
@@ -14,7 +14,7 @@
 
       <div
         x-ref="bubble"
-        class="fixed w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-2xl bg-white text-ink-900 shadow-lg ring-1 ring-ink-950/5 transition-all duration-300"
+        class="fixed w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-2xl bg-white text-ink-900 shadow-lg ring-1 ring-ink-950/5"
         :class="bubble.placement === 'center' && 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'"
         :style="bubble.placement !== 'center' && `top:${bubble.top}px;left:${bubble.left}px`"
       >

@@ -133,15 +133,11 @@ export function clientTour({ tour = 'editor' } = {}) {
     index: 0,
     off: false,
     hole: null,
+    tracking: false,
     bubble: { top: 0, left: 0, placement: 'center' },
 
     init() {
       this.off = storage('local', 'get', OFF_KEY) === '1';
-      const reposition = () => this.open && this.place();
-
-      window.addEventListener('resize', reposition);
-      window.addEventListener('scroll', reposition, { passive: true });
-
       if (!this.off && storage('session', 'get', SEEN_KEY) !== '1') {
         // Chwila na wczytanie obrazków i Alpine, żeby pozycje elementów były już ostateczne.
         setTimeout(() => this.start(), 600);
@@ -196,19 +192,45 @@ export function clientTour({ tour = 'editor' } = {}) {
       const el = this.step.target ? document.querySelector(this.step.target) : null;
 
       if (el) {
-        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        // Po przewinięciu (smooth) przeliczamy jeszcze raz.
-        setTimeout(() => this.place(), 350);
+        const rect = el.getBoundingClientRect();
+        const header = this.headerHeight();
+        // Wysoki element (np. cały projekt) — pokazujemy jego początek pod nagłówkiem, niski — na środku ekranu.
+        const top = rect.height > (window.innerHeight - header) * 0.6
+          ? window.scrollY + rect.top - header - 24
+          : window.scrollY + rect.top - (window.innerHeight - rect.height) / 2;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
       }
 
-      this.place();
+      this.track();
       this.$nextTick(() => this.$refs.next?.focus({ preventScroll: true }));
+    },
+
+    // Pozycję liczymy w każdej klatce, dopóki samouczek jest otwarty — podświetlenie nadąża za płynnym
+    // przewijaniem, doładowanymi obrazkami i zmianą układu.
+    track() {
+      if (this.tracking) return;
+      this.tracking = true;
+      const loop = () => {
+        if (!this.open) {
+          this.tracking = false;
+          return;
+        }
+        this.place();
+        requestAnimationFrame(loop);
+      };
+      requestAnimationFrame(loop);
+    },
+
+    headerHeight() {
+      const header = document.querySelector('header.sticky');
+
+      return header ? header.getBoundingClientRect().height : 0;
     },
 
     place() {
       const el = this.step.target ? document.querySelector(this.step.target) : null;
 
-      if (!el) {
+      if (!el || !visible(el)) {
         this.hole = null;
         this.bubble = { top: 0, left: 0, placement: 'center' };
 
@@ -216,23 +238,28 @@ export function clientTour({ tour = 'editor' } = {}) {
       }
 
       const rect = el.getBoundingClientRect();
-      const width = Math.min(352, window.innerWidth - 32);
-      const height = this.$refs.bubble?.offsetHeight ?? 200;
+      const viewTop = this.headerHeight() + PAD;
+      const viewBottom = window.innerHeight - PAD;
+      const width = this.$refs.bubble?.offsetWidth || Math.min(384, window.innerWidth - 32);
+      const height = this.$refs.bubble?.offsetHeight || 220;
+      const gap = 12;
 
-      this.hole = {
-        top: rect.top - PAD,
-        left: rect.left - PAD,
-        width: rect.width + PAD * 2,
-        height: Math.min(rect.height, window.innerHeight * 0.7) + PAD * 2,
-      };
+      // Podświetlamy tylko widoczną część elementu (wysokie elementy wychodzą poza ekran).
+      const top = Math.max(rect.top - PAD, viewTop);
+      const bottom = Math.min(rect.bottom + PAD, viewBottom);
+      this.hole = bottom > top
+        ? { top, left: rect.left - PAD, width: rect.width + PAD * 2, height: bottom - top }
+        : null;
 
-      const below = rect.bottom + PAD + 12;
-      const top = below + height < window.innerHeight
-        ? below
-        : Math.max(16, rect.top - PAD - 12 - height);
+      let bubbleTop;
+      if (bottom + gap + height <= viewBottom) bubbleTop = bottom + gap;
+      else if (top - gap - height >= viewTop) bubbleTop = top - gap - height;
+      else bubbleTop = Math.min(Math.max(viewTop + gap, bottom - height - gap), viewBottom - height); // na elemencie
+
       const left = Math.min(Math.max(16, rect.left), window.innerWidth - width - 16);
+      const next = { top: Math.round(bubbleTop), left: Math.round(left), placement: 'anchored' };
 
-      this.bubble = { top, left, placement: 'anchored' };
+      if (next.top !== this.bubble.top || next.left !== this.bubble.left || this.bubble.placement !== 'anchored') this.bubble = next;
     },
 
     keydown(event) {
