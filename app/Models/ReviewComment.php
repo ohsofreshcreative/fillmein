@@ -29,6 +29,7 @@ class ReviewComment extends Model
 		'request_id',
 		'lock_version',
 		'edited_at',
+		'deleted_at',
 	];
 
 	protected function casts(): array
@@ -38,6 +39,7 @@ class ReviewComment extends Model
 			'author_user_id' => 'integer',
 			'lock_version' => 'integer',
 			'edited_at' => 'datetime',
+			'deleted_at' => 'datetime',
 		];
 	}
 
@@ -68,6 +70,23 @@ class ReviewComment extends Model
 		}
 
 		return trim((string) $this->author_name) !== '' ? $this->author_name : 'Gość';
+	}
+
+	public function isDeleted(): bool
+	{
+		return $this->deleted_at !== null;
+	}
+
+	/**
+	 * Wiadomość gościa z tego samego linku i pod tą samą podaną nazwą (gość nie ma konta — to najlepsze dostępne
+	 * przypisanie autorstwa).
+	 */
+	public function isAuthoredByGuest(\App\Support\ReviewGuest $guest): bool
+	{
+		return $this->author_type === ActorType::Client
+			&& (int) $this->author_access_id === (int) $guest->access->id
+			&& $guest->name !== null
+			&& $this->author_name === $guest->name;
 	}
 
 	public function isGuest(): bool

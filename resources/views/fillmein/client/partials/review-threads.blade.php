@@ -43,6 +43,21 @@
                   @endif
                 </div>
                 <p class="text-sm break-words whitespace-pre-line text-ink-950" data-message-body>{{ $comment->body }}</p>
+                @if (isset($guest) && $guest->access->can_comment && $comment->isAuthoredByGuest($guest))
+                  <div class="mt-1">
+                    <x-ui.confirm
+                      :action="route('fmi.review.comments.delete', $comment->id)"
+                      title="Usunąć wiadomość?"
+                      confirm="Usuń"
+                      trigger="Usuń"
+                      trigger-variant="danger-ghost"
+                      trigger-size="sm"
+                      aria-label="Usuń swoją wiadomość"
+                    >
+                      Twoja wiadomość zniknie z recenzji.
+                    </x-ui.confirm>
+                  </div>
+                @endif
               </li>
             @endforeach
           </ol>

@@ -121,6 +121,44 @@ class ReviewDiscussionService
 		});
 	}
 
+	/**
+	 * Usuwa wiadomość bez kasowania: znika u klienta, zespół widzi ją w panelu jako usuniętą (kto i kiedy — zdarzenie
+	 * `comment_deleted` z poprzednią treścią). Gość usuwa tylko własne wiadomości, zespół (manageReviews) — dowolne.
+	 */
+	public function delete(Project $project, ReviewComment $comment, WP_User|ReviewGuest $by): ReviewComment
+	{
+		$author = ReviewGuest::author($by);
+
+		return DB::transaction(function () use ($project, $comment, $author) {
+			$locked = ReviewComment::query()->where('project_id', $project->id)->whereKey($comment->id)->lockForUpdate()->firstOrFail();
+
+			if ($locked->isDeleted()) {
+				return $locked;
+			}
+
+			$thread = $locked->thread()->firstOrFail();
+
+			ReviewThreadEvent::create([
+				'project_id' => $project->id,
+				'thread_id' => $thread->id,
+				'comment_id' => $locked->id,
+				'type' => ReviewThreadEvent::COMMENT_DELETED,
+				'previous_body' => $locked->body,
+				'actor_type' => $author['type'],
+				'actor_user_id' => $author['user'],
+				'actor_access_id' => $author['access'],
+			]);
+			$locked->update(['deleted_at' => now(), 'lock_version' => $locked->lock_version + 1]);
+
+			$this->activity->log('review.comment_deleted', $author['actor'], $project, $thread, array_filter([
+				'number' => $thread->number,
+				'guest_name' => $author['type'] === ActorType::Client ? $author['name'] : null,
+			], fn ($value) => $value !== null));
+
+			return $locked;
+		});
+	}
+
 	public function changeStatus(Project $project, ReviewThread $thread, ReviewThreadStatus $to, int $version, WP_User $by): ReviewThread
 	{
 		$this->assertInProject($project, $thread);

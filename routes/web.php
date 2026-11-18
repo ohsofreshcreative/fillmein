@@ -84,6 +84,7 @@ Route::middleware(['web', 'fmi.app:staff', 'fmi.staff'])
 				Route::post('links/{link}/revoke', [DesignReviewController::class, 'revokeLink'])->whereNumber('link')->name('links.revoke');
 				Route::post('threads/{thread}/replies', [DesignReviewController::class, 'storeReply'])->whereNumber('thread')->middleware('throttle:fmi-review-comments')->name('threads.replies.store');
 				Route::post('threads/{thread}/status', [DesignReviewController::class, 'changeStatus'])->whereNumber('thread')->middleware('throttle:fmi-review-status')->name('threads.status');
+				Route::post('threads/{thread}/comments/{comment}/delete', [DesignReviewController::class, 'deleteComment'])->whereNumber(['thread', 'comment'])->middleware('throttle:fmi-review-comments')->name('threads.comments.delete');
 				Route::post('threads/{thread}/comments/{comment}', [DesignReviewController::class, 'updateComment'])->whereNumber(['thread', 'comment'])->middleware('throttle:fmi-review-comments')->name('threads.comments.update');
 			});
 
@@ -287,6 +288,7 @@ Route::middleware(['web', 'fmi.app:client'])
 			Route::middleware(['throttle:fmi-review-guest', 'fmi.review-guest:comment'])->group(function () {
 				Route::post('comments', [ReviewGuestController::class, 'storeComment'])->name('comments.store');
 				Route::post('threads/{thread}/replies', [ReviewGuestController::class, 'storeReply'])->whereNumber('thread')->name('threads.replies.store');
+				Route::post('comments/{comment}/delete', [ReviewGuestController::class, 'deleteComment'])->whereNumber('comment')->name('comments.delete');
 			});
 		});
 	});

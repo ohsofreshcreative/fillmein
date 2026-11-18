@@ -269,6 +269,22 @@ class DesignReviewController extends Controller
 			: redirect()->to($this->threadUrl($request, $project, $thread))->with('status', 'Zapisano zmianę wiadomości w uwadze ' . $thread->number . '.');
 	}
 
+	public function deleteComment(Request $request, Project $project, int $thread, int $comment, ReviewDiscussionService $discussion): JsonResponse|RedirectResponse
+	{
+		$this->authorize('viewReview', $project);
+
+		$model = \App\Models\ReviewComment::query()->where('project_id', $project->id)->where('thread_id', $thread)->findOrFail($comment);
+		$this->authorize('deleteReviewComment', [$project, $model]);
+
+		$discussion->delete($project, $model, Staff::current());
+		$number = $model->thread()->value('number');
+
+		return $request->expectsJson()
+			? response()->json(['id' => $model->id])
+			: redirect()->to(route('fmi.design-review.show', array_filter([$project, 'status' => $request->input('filter')])) . '#uwaga-' . $number)
+				->with('status', 'Usunięto wiadomość z uwagi ' . $number . '. Klient już jej nie widzi; w panelu zostaje jako usunięta.');
+	}
+
 	public function changeStatus(ChangeReviewStatusRequest $request, Project $project, ReviewDiscussionService $discussion): JsonResponse|RedirectResponse
 	{
 		$thread = $request->thread();

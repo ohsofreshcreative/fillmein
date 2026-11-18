@@ -83,7 +83,10 @@
                 $commentErrors = $errors->getBag('comment' . $comment->id);
                 $editing = (string) old('comment_form') === (string) $comment->id;
               @endphp
-              <li @class(['flex flex-col gap-1 rounded-xl p-3', 'bg-ink-50' => ! $loop->first, 'border border-ink-150' => $loop->first]) data-comment="{{ $comment->id }}">
+              @php
+                $deletedEvent = $comment->isDeleted() ? $thread->events->where('type', \App\Models\ReviewThreadEvent::COMMENT_DELETED)->where('comment_id', $comment->id)->last() : null;
+              @endphp
+              <li @class(['flex flex-col gap-1 rounded-xl p-3', 'bg-ink-50' => ! $loop->first && ! $comment->isDeleted(), 'border border-ink-150' => $loop->first && ! $comment->isDeleted(), 'border border-dashed border-danger-200 bg-danger-50/40' => $comment->isDeleted()]) data-comment="{{ $comment->id }}" @if ($comment->isDeleted()) data-comment-deleted @endif>
                 <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-ink-500">
                   <span class="text-sm font-semibold text-ink-950" data-comment-author>{{ $comment->authorName() }}</span>
                   @if ($comment->isGuest())
@@ -94,9 +97,30 @@
                     <span data-comment-edited>· edytowano {{ $comment->edited_at->format('d.m.Y H:i') }}</span>
                   @endif
                 </div>
-                <p class="text-sm break-words whitespace-pre-line text-ink-950" data-message-body>{{ $comment->body }}</p>
+                @if ($comment->isDeleted())
+                  <p class="text-xs font-medium text-danger-700" data-comment-deleted-note>
+                    Usunięta{{ $deletedEvent ? ' przez: ' . $deletedEvent->actorName() : '' }} · {{ $comment->deleted_at->format('d.m.Y H:i') }} · klient jej nie widzi
+                  </p>
+                @endif
+                <p @class(['text-sm break-words whitespace-pre-line', 'text-ink-950' => ! $comment->isDeleted(), 'text-ink-500 line-through' => $comment->isDeleted()]) data-message-body>{{ $comment->body }}</p>
 
-                @if (! $thread->isResolved() && Gate::allows('editReviewComment', [$project, $comment]))
+                @if (! $comment->isDeleted() && Gate::allows('deleteReviewComment', [$project, $comment]))
+                  <div class="mt-1">
+                    <x-ui.confirm
+                      :action="route('fmi.design-review.threads.comments.delete', [$project, $thread->id, $comment->id]) . ($filterValue ? '?filter=' . urlencode($filterValue) : '')"
+                      title="Usunąć wiadomość?"
+                      confirm="Usuń"
+                      trigger="Usuń"
+                      trigger-variant="danger-ghost"
+                      trigger-size="sm"
+                      :aria-label="'Usuń wiadomość: ' . $comment->authorName()"
+                    >
+                      Wiadomość zniknie u klienta. W panelu zostanie jako usunięta (z informacją, kto i kiedy ją usunął).
+                    </x-ui.confirm>
+                  </div>
+                @endif
+
+                @if (! $comment->isDeleted() && ! $thread->isResolved() && Gate::allows('editReviewComment', [$project, $comment]))
                   <details class="group mt-1" @if ($editing) open @endif>
                     <summary class="w-fit cursor-pointer text-xs font-medium text-ink-700 underline underline-offset-2 outline-none focus-visible:ring-2 focus-visible:ring-fresh-500">Edytuj</summary>
                     <form method="POST" action="{{ route('fmi.design-review.threads.comments.update', [$project, $thread->id, $comment->id]) }}" class="mt-2 flex flex-col gap-2" data-loading-form data-edit-form>

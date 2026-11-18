@@ -34,6 +34,7 @@
       'guest' => $comment->isGuest(),
       'time' => $comment->created_at?->format('d.m.Y H:i'),
       'body' => $comment->body,
+      'deleted' => $comment->isDeleted(),
     ])->values(),
   ])->values();
 @endphp
@@ -188,7 +189,8 @@
                       <span x-show="comment.guest">gość</span>
                       <span x-text="comment.time"></span>
                     </div>
-                    <p class="text-sm break-words whitespace-pre-line text-ink-900" x-text="comment.body"></p>
+                    <p x-show="comment.deleted" class="text-xs font-medium text-danger-700">Usunięta — klient jej nie widzi</p>
+                    <p class="text-sm break-words whitespace-pre-line" :class="comment.deleted ? 'text-ink-500 line-through' : 'text-ink-900'" x-text="comment.body"></p>
                   </li>
                 </template>
               </ol>

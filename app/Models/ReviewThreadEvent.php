@@ -21,6 +21,8 @@ class ReviewThreadEvent extends Model
 
 	public const COMMENT_EDITED = 'comment_edited';
 
+	public const COMMENT_DELETED = 'comment_deleted';
+
 	protected $table = 'fmi_review_thread_events';
 
 	protected $fillable = [
@@ -59,7 +61,7 @@ class ReviewThreadEvent extends Model
 			return $user ? $user->display_name : 'Usunięte konto';
 		}
 
-		return 'Klient';
+		return $this->actor_type === ActorType::Client ? 'Klient (gość)' : 'Klient';
 	}
 
 	public function describe(): string
@@ -68,6 +70,7 @@ class ReviewThreadEvent extends Model
 			self::REOPENED => 'ponownie otworzył(a) wątek (' . $this->from_status?->label() . ' → ' . $this->to_status?->label() . ')',
 			self::STATUS_CHANGED => 'zmienił(a) status: ' . $this->from_status?->label() . ' → ' . $this->to_status?->label(),
 			self::COMMENT_EDITED => 'edytował(a) wiadomość',
+			self::COMMENT_DELETED => 'usunął(-ęła) wiadomość',
 			default => $this->type,
 		};
 	}

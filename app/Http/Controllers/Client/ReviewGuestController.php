@@ -115,7 +115,9 @@ class ReviewGuestController extends Controller
 				'revision' => $revision,
 				'screens' => $revision?->screens()->get() ?? collect(),
 				'threads' => $revision
-					? $project->reviewThreads()->where('revision_id', $revision->id)->whereNotNull('number')->with(['comments', 'screen'])->orderBy('number')->get()
+					? $project->reviewThreads()->where('revision_id', $revision->id)->whereNotNull('number')->with(['comments' => fn ($query) => $query->whereNull('deleted_at'), 'screen'])->orderBy('number')->get()
+						// Wątek, którego wszystkie wiadomości usunięto, znika u klienta (zespół widzi go w panelu).
+						->filter(fn ($thread) => $thread->comments->isNotEmpty())->values()
 					: collect(),
 				'embed' => FigmaEmbed::forLink($url, $figma->status()['client_id']),
 			])
@@ -167,6 +169,25 @@ class ReviewGuestController extends Controller
 		return $request->expectsJson()
 			? response()->json(['number' => $model->number], 201)
 			: redirect()->to(route('fmi.review.show') . '#uwaga-' . $model->number)->with('status', 'Dodano odpowiedź do uwagi ' . $model->number . '.');
+	}
+
+	/**
+	 * Gość usuwa własną wiadomość (ten sam link i podana nazwa). Zespół nadal widzi ją w panelu jako usuniętą.
+	 */
+	public function deleteComment(Request $request, int $comment, ReviewDiscussionService $discussion): JsonResponse|RedirectResponse
+	{
+		$guest = $this->named($request);
+		$project = $guest->access->project;
+		$model = \App\Models\ReviewComment::query()->where('project_id', $project->id)->whereNull('deleted_at')->findOrFail($comment);
+
+		abort_unless($model->isAuthoredByGuest($guest), 403, 'Możesz usuwać tylko własne wiadomości.');
+
+		$discussion->delete($project, $model, $guest);
+		$number = $model->thread()->value('number');
+
+		return $request->expectsJson()
+			? response()->json(['id' => $model->id])
+			: redirect()->to(route('fmi.review.show') . '#uwagi')->with('status', 'Usunięto wiadomość z uwagi ' . $number . '.');
 	}
 
 	public function storeDecision(StoreGuestReviewDecisionRequest $request, ReviewDecisionService $decisions): JsonResponse|RedirectResponse

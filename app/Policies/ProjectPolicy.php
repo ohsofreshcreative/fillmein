@@ -162,6 +162,24 @@ class ProjectPolicy
 		return $comment->isAuthoredBy($user) ? Response::allow() : Response::deny('Możesz edytować tylko własne wiadomości.');
 	}
 
+	/**
+	 * Usunięcie wiadomości w uwadze: autor — własną, osoba z `fmi_manage_reviews` — dowolną w projekcie.
+	 */
+	public function deleteReviewComment(WP_User $user, Project $project, ReviewComment $comment): Response
+	{
+		$assigned = $this->assigned($user, $project);
+
+		if ($assigned->denied() || $comment->project_id !== $project->id) {
+			return Response::denyAsNotFound();
+		}
+
+		if ($comment->isAuthoredBy($user) || $this->manageReviews($user, $project)->allowed()) {
+			return Response::allow();
+		}
+
+		return Response::deny('Możesz usuwać tylko własne wiadomości.');
+	}
+
 	public function delete(WP_User $user, Project $project): Response
 	{
 		return $this->owned($user, $project, 'fmi_delete_projects');
