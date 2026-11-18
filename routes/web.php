@@ -74,6 +74,7 @@ Route::middleware(['web', 'fmi.app:staff', 'fmi.staff'])
 				Route::get('/', [DesignReviewController::class, 'show'])->name('show');
 				Route::post('prototype', [DesignReviewController::class, 'savePrototype'])->name('prototype');
 				Route::post('screens', [DesignReviewController::class, 'storeScreen'])->name('screens.store');
+				Route::post('screens/{screen}/delete', [DesignReviewController::class, 'destroyScreen'])->whereNumber('screen')->name('screens.destroy');
 				Route::get('screens/{screen}/image', [DesignReviewController::class, 'screenImage'])->whereNumber('screen')->name('screens.image');
 				Route::post('comments', [DesignReviewController::class, 'storeComment'])->middleware('throttle:fmi-review-comments')->name('comments.store');
 				Route::post('decision', [DesignReviewController::class, 'storeDecision'])->middleware('throttle:fmi-review-status')->name('decision.store');

@@ -73,6 +73,20 @@ class ClientAccess extends Model
 		return $token ? home_url('/p/' . $token) : null;
 	}
 
+	/**
+	 * Pełny adres linku recenzji dla panelu; null dla linków bez zapisanej kopii (sprzed 2026-11-18).
+	 */
+	public function reviewUrl(): ?string
+	{
+		if ($this->scope !== self::SCOPE_REVIEW || ! $this->token_sealed) {
+			return null;
+		}
+
+		$token = \App\Support\SecretBox::open($this->token_sealed);
+
+		return $token ? home_url('/r/' . $token) : null;
+	}
+
 	public function project(): BelongsTo
 	{
 		return $this->belongsTo(Project::class);

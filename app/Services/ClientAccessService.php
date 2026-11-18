@@ -14,7 +14,7 @@ use WP_User;
  * Generowanie, weryfikacja i unieważnianie linków klientów.
  *
  * Token: 256 bitów z CSPRNG, kodowany base64url. Wyszukiwanie po SHA-256 (hex); link Treści ma też kopię
- * zaszyfrowaną SecretBoxem, żeby panel pokazywał adres (link Design Review — nie). SHA-256 —
+ * zaszyfrowaną SecretBoxem, żeby panel pokazywał adres (link Design Review — od 2026-11-18 też). SHA-256 —
  * przy tej entropii zwykły hash wystarcza i pozwala na wyszukiwanie po indeksie
  * (bez soli, która uniemożliwiłaby lookup, i bez zależności od rotacji soli WP).
  */
@@ -84,6 +84,8 @@ class ClientAccessService
 		$access = $project->clientAccesses()->create([
 			'scope' => ClientAccess::SCOPE_REVIEW,
 			'token_hash' => $this->hash($token),
+			// Decyzja właściciela (2026-11-18): adres recenzji też jest widoczny w panelu — kopia zaszyfrowana SecretBoxem.
+			'token_sealed' => SecretBox::seal($token),
 			'label' => $label,
 			'can_comment' => $canComment,
 			'can_approve' => $canApprove,

@@ -74,11 +74,26 @@
                 <span class="text-xs font-medium text-ink-500">{{ $loop->iteration }}.</span>
                 <span class="min-w-0 text-sm font-medium break-words text-ink-950">{{ $screen->name }}</span>
               </span>
-              @if ($screen->surface_confirmed)
-                <x-ui.badge variant="success">Pinezki</x-ui.badge>
-              @else
-                <x-ui.badge variant="muted">Bez pinezek</x-ui.badge>
-              @endif
+              <span class="flex items-center gap-2">
+                @if ($screen->surface_confirmed)
+                  <x-ui.badge variant="success">Pinezki</x-ui.badge>
+                @else
+                  <x-ui.badge variant="muted">Bez pinezek</x-ui.badge>
+                @endif
+                @if ($canManage)
+                  <x-ui.confirm
+                    :action="route('fmi.design-review.screens.destroy', [$project, $screen->id])"
+                    title="Usunąć podstronę?"
+                    confirm="Usuń"
+                    trigger="Usuń"
+                    trigger-variant="danger-ghost"
+                    trigger-size="sm"
+                    :aria-label="'Usuń podstronę: ' . $screen->name"
+                  >
+                    Podstrona „{{ $screen->name }}” zniknie z recenzji. Uwagi do niej zostaną na liście (bez pinezek). Możesz potem dodać nowszą wersję.
+                  </x-ui.confirm>
+                @endif
+              </span>
             </li>
           @endforeach
         </ol>

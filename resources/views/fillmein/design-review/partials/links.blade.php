@@ -1,6 +1,6 @@
 {{--
   Linki recenzji dla klienta (zakres `review`): odczyt zawsze, komentowanie i akceptacja — jawnie. Bez terminu ważności: działa do unieważnienia.
-  Adres widać tylko raz (link-issued). Dane: $project, $links (ClientAccess zakresu review).
+  Adres jest zapisany (SecretBox) i widoczny w panelu z „Kopiuj link”; linki sprzed 2026-11-18 — tylko raz. Dane: $project, $links (ClientAccess zakresu review).
 --}}
 <x-ui.card>
   <x-slot:header>
@@ -29,6 +29,18 @@
           <p class="text-xs text-ink-500">
             {{ $link->expires_at ? 'Ważny do ' . $link->expires_at->format('d.m.Y H:i') : 'Bez terminu — do unieważnienia' }}{{ $link->last_used_at ? ' · ostatnio użyty ' . $link->last_used_at->format('d.m.Y H:i') : ' · jeszcze nieużyty' }}
           </p>
+          @if ($link->isActive() && ($linkUrl = $link->reviewUrl()))
+            <div class="flex w-full flex-col gap-2 sm:flex-row sm:items-center" x-data="{ copied: false, copy() { $refs.url.select(); navigator.clipboard?.writeText($refs.url.value); document.execCommand('copy'); this.copied = true; setTimeout(() => this.copied = false, 2000); } }" data-review-link-url>
+              <label class="sr-only" for="review-url-{{ $link->id }}">Adres recenzji dla klienta</label>
+              <input id="review-url-{{ $link->id }}" type="text" value="{{ $linkUrl }}" readonly x-ref="url" x-on:focus="$el.select()" class="h-9 w-full min-w-0 flex-1 rounded-lg border border-ink-200 bg-ink-50 px-3 text-sm text-ink-900 focus:ring-focus">
+              <div class="flex shrink-0 items-center gap-2">
+                <x-ui.button size="sm" x-on:click="copy()"><span x-text="copied ? 'Skopiowano' : 'Kopiuj link'">Kopiuj link</span></x-ui.button>
+                <x-ui.button size="sm" variant="secondary" :href="$linkUrl" target="_blank" rel="noopener noreferrer">Otwórz</x-ui.button>
+              </div>
+            </div>
+          @elseif ($link->isActive())
+            <p class="text-xs text-ink-500">Adres tego linku nie jest zapisany (link sprzed zmiany). Utwórz nowy, żeby był tu zawsze widoczny.</p>
+          @endif
           @if ($link->isActive())
             <form method="POST" action="{{ route('fmi.design-review.links.revoke', [$project, $link->id]) }}" class="flex justify-end" data-loading-form>
               @csrf

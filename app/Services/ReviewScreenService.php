@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Models\ReviewRevision;
 use App\Models\ReviewScreen;
 use App\Support\Actor;
+use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use WP_User;
 
@@ -83,6 +84,33 @@ class ReviewScreenService
 		]);
 
 		return $screen;
+	}
+
+	/**
+	 * Usuwa podstronę z bieżącej rewizji (np. żeby dodać nowszą). Uwagi zostają: tracą przypięcie do ekranu, a nazwa
+	 * ekranu trafia do ich kontekstu, więc na liście nadal wiadomo, czego dotyczyły.
+	 */
+	public function remove(Project $project, ReviewScreen $screen, WP_User $by): void
+	{
+		$revision = $screen->revision;
+
+		if ((int) $screen->project_id !== (int) $project->id || ! $revision || $revision->status === ReviewRevisionStatus::Superseded) {
+			throw new InvalidArgumentException('Podstrony można usuwać tylko z bieżącej rewizji.');
+		}
+
+		DB::transaction(function () use ($screen) {
+			\App\Models\ReviewThread::query()
+				->where('screen_id', $screen->id)
+				->whereNull('context')
+				->update(['context' => mb_substr($screen->name, 0, 190)]);
+
+			$screen->delete();
+		});
+
+		$this->activity->log('review.screen_removed', Actor::user($by), $project, null, [
+			'revision' => $revision->number,
+			'screen' => $screen->name,
+		]);
 	}
 
 	/**

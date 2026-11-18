@@ -177,6 +177,21 @@ class DesignReviewController extends Controller
 	/**
 	 * Obraz ekranu z prywatnego dysku, tylko w zakresie projektu.
 	 */
+	public function destroyScreen(Project $project, int $screen, ReviewScreenService $screens): RedirectResponse
+	{
+		$this->authorize('manageReviews', $project);
+
+		$model = $project->reviewScreens()->findOrFail($screen);
+
+		try {
+			$screens->remove($project, $model, Staff::current());
+		} catch (InvalidArgumentException $e) {
+			return redirect()->route('fmi.design-review.show', $project)->with('error', $e->getMessage());
+		}
+
+		return redirect()->route('fmi.design-review.show', $project)->with('status', 'Usunięto podstronę „' . $model->name . '”. Jej uwagi zostały na liście.');
+	}
+
 	public function screenImage(Project $project, int $screen, FigmaFrameService $frames): StreamedResponse
 	{
 		$this->authorize('viewReview', $project);
