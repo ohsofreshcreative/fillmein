@@ -19,20 +19,23 @@ class AppLayout extends Composer
 	public function with(): array
 	{
 		$user = Staff::current();
+		// Treści i Design Review to ta sama lista projektów z filtrem modułu (?module=).
+		$module = request()->routeIs('fmi.projects.index') ? (string) request()->query('module') : '';
 
 		return [
 			'staffUser' => $user,
 			'staffRole' => $user ? Staff::roleLabel($user) : null,
 			'navigation' => array_values(array_filter([
-				['label' => 'Pulpit', 'route' => 'fmi.dashboard', 'active' => 'fmi.dashboard', 'icon' => 'home'],
-				['label' => 'Projekty', 'route' => 'fmi.projects.index', 'active' => 'fmi.projects.*', 'icon' => 'folder'],
-				['label' => 'Design Review', 'route' => 'fmi.design-review.index', 'active' => 'fmi.design-review.*', 'icon' => 'review'],
-				['label' => 'Powiadomienia', 'route' => 'fmi.notifications.index', 'active' => 'fmi.notifications.*', 'icon' => 'bell', 'count' => $user ? Notification::query()->for($user)->unread()->count() : 0],
+				['label' => 'Pulpit', 'url' => route('fmi.dashboard'), 'active' => request()->routeIs('fmi.dashboard'), 'icon' => 'home'],
+				['label' => 'Projekty', 'url' => route('fmi.projects.index'), 'active' => request()->routeIs('fmi.projects.index', 'fmi.projects.create', 'fmi.projects.edit') && $module === '', 'icon' => 'folder'],
+				['label' => 'Treści', 'url' => route('fmi.projects.index', ['module' => 'content']), 'active' => $module === 'content' || (request()->routeIs('fmi.projects.*') && ! request()->routeIs('fmi.projects.index', 'fmi.projects.create', 'fmi.projects.edit')), 'icon' => 'pencil'],
+				['label' => 'Design Review', 'url' => route('fmi.projects.index', ['module' => 'review']), 'active' => $module === 'review' || request()->routeIs('fmi.design-review.*'), 'icon' => 'review'],
+				['label' => 'Powiadomienia', 'url' => route('fmi.notifications.index'), 'active' => request()->routeIs('fmi.notifications.*'), 'icon' => 'bell', 'count' => $user ? Notification::query()->for($user)->unread()->count() : 0],
 				Gate::allows('manage-users')
-					? ['label' => 'Użytkownicy', 'route' => 'fmi.users.index', 'active' => 'fmi.users.*', 'icon' => 'users']
+					? ['label' => 'Użytkownicy', 'url' => route('fmi.users.index'), 'active' => request()->routeIs('fmi.users.*'), 'icon' => 'users']
 					: null,
 				Gate::allows('manage-integrations')
-					? ['label' => 'Figma', 'route' => 'fmi.settings.figma', 'active' => 'fmi.settings.figma*', 'icon' => 'figma']
+					? ['label' => 'Figma', 'url' => route('fmi.settings.figma'), 'active' => request()->routeIs('fmi.settings.figma*'), 'icon' => 'figma']
 					: null,
 			])),
 			'profileUrl' => route('fmi.profile'),

@@ -55,29 +55,14 @@ class DesignReviewController extends Controller
 	{
 	}
 
-	public function index(Request $request): View
+	/**
+	 * Lista projektów z Design Review to ta sama lista co „Projekty”, z filtrem modułu.
+	 */
+	public function index(Request $request): \Illuminate\Http\RedirectResponse
 	{
 		$this->authorize('viewAny', Project::class);
 
-		$perPage = (int) config('fillmein.projects.per_page', 20);
-		$query = Project::query()
-			->visibleTo(Staff::current())
-			->withModule(ProjectModule::Review)
-			->where('status', '!=', ProjectStatus::Archived->value);
-
-		$total = (clone $query)->count();
-		$lastPage = max(1, (int) ceil($total / $perPage));
-		$page = min(max(1, $request->integer('page', 1)), $lastPage);
-		$projects = $query->latest('updated_at')->orderBy('id', 'desc')->forPage($page, $perPage)->get();
-
-		return view('fillmein.design-review.index', [
-			'projects' => $projects,
-			'overview' => $this->reviews->overview($projects),
-			'total' => $total,
-			'page' => $page,
-			'lastPage' => $lastPage,
-			'pageUrl' => fn (int $number) => route('fmi.design-review.index', $number > 1 ? ['page' => $number] : []),
-		]);
+		return redirect()->route('fmi.projects.index', ['module' => ProjectModule::Review->value] + $request->query());
 	}
 
 	/**

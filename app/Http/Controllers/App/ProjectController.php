@@ -51,7 +51,7 @@ class ProjectController extends Controller
 	/**
 	 * Paginacja ręczna: pakiet illuminate/pagination nie jest zainstalowany w motywie.
 	 */
-	public function index(Request $request): View
+	public function index(Request $request, \App\Services\ReviewService $reviews): View
 	{
 		$this->authorize('viewAny', Project::class);
 
@@ -76,6 +76,7 @@ class ProjectController extends Controller
 		return view('fillmein.projects.index', [
 			'projects' => $projects,
 			'progress' => ProjectProgress::forProjects($projects),
+			'review' => $filters['module'] === ProjectModule::Review->value ? $reviews->overview($projects) : [],
 			'people' => $this->peopleFor($projects),
 			'filters' => $filters,
 			'statuses' => collect(ProjectStatus::cases())->mapWithKeys(fn (ProjectStatus $s) => [$s->value => $s->label()])->all(),
@@ -258,11 +259,12 @@ class ProjectController extends Controller
 			'mine' => $request->query('mine') ? '1' : '',
 			'sort' => array_key_exists($sort, self::SORTS) ? $sort : 'updated',
 			'dir' => in_array($dir, ['asc', 'desc'], true) ? $dir : '',
+			'module' => ProjectModule::tryFrom((string) $request->query('module'))?->value ?? '',
 		];
 	}
 
 	/**
-	 * @param array{q: string, status: string, mine: string, sort: string, dir: string} $filters
+	 * @param array{q: string, status: string, mine: string, sort: string, dir: string, module: string} $filters
 	 */
 	private function filteredQuery(array $filters): Builder
 	{
@@ -270,7 +272,7 @@ class ProjectController extends Controller
 
 		return Project::query()
 			->visibleTo($user)
-			->withModule(ProjectModule::Content)
+			->when($filters['module'] !== '', fn (Builder $query) => $query->withModule(ProjectModule::from($filters['module'])))
 			->when($filters['q'] !== '', function (Builder $query) use ($filters) {
 				// Escapowanie znaków wieloznacznych, żeby wpisany `%` nie zmieniał sensu zapytania.
 				$term = '%' . addcslashes($filters['q'], '%_\\') . '%';

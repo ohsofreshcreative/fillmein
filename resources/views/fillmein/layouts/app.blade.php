@@ -32,10 +32,10 @@
       <nav class="flex-1 overflow-y-auto px-3 py-4" aria-label="Główna nawigacja">
         <ul class="flex flex-col gap-0.5">
           @foreach ($navigation as $item)
-            @php($active = request()->routeIs($item['active']))
+            @php($active = $item['active'])
             <li>
               <a
-                href="{{ route($item['route']) }}"
+                href="{{ $item['url'] }}"
                 @if ($active) aria-current="page" @endif
                 @class([
                   'flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium transition duration-150',

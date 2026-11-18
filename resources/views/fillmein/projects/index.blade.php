@@ -1,9 +1,19 @@
 @extends('fillmein.layouts.app')
 
-@section('title', 'Projekty')
+@php
+  $module = $filters['module'];
+  $isReview = $module === 'review';
+  [$heading, $intro] = match ($module) {
+    'content' => ['Treści', 'Projekty z włączonym modułem Treści — zbieranie treści od klienta.'],
+    'review' => ['Design Review', 'Projekty z włączonym modułem Design Review — uwagi i akceptacje projektu graficznego.'],
+    default => ['Projekty', 'Wszystkie projekty, do których masz dostęp. Każdy może mieć Treści, Design Review albo oba moduły.'],
+  };
+@endphp
+
+@section('title', $heading)
 
 @section('content')
-  <x-ui.page-header title="Projekty" description="Wszystkie projekty, do których masz dostęp. Każdy może mieć Treści, Design Review albo oba moduły.">
+  <x-ui.page-header :title="$heading" :description="$intro">
     @if ($canCreate)
       <x-slot:actions>
         <x-ui.button :href="route('fmi.projects.create')">
@@ -15,14 +25,17 @@
   </x-ui.page-header>
 
   <form method="GET" action="{{ route('fmi.projects.index') }}" class="mt-8 grid gap-3 sm:grid-cols-[minmax(0,1fr)_12rem_12rem_auto] sm:items-end" role="search">
+    @if ($module !== '')
+      <input type="hidden" name="module" value="{{ $module }}">
+    @endif
     <x-ui.input name="q" label="Szukaj" :value="$filters['q']" placeholder="Nazwa projektu lub klienta" type="search" />
     <x-ui.select name="status" label="Status" :options="$statuses" :value="$filters['status']" placeholder="Aktywne (bez archiwum)" />
     <x-ui.select name="sort" label="Sortuj" :options="$sorts" :value="$filters['sort']" />
 
     <div class="flex gap-2">
       <x-ui.button type="submit" variant="secondary">Filtruj</x-ui.button>
-      @if (array_filter($filters, fn ($value, $key) => $value !== '' && $key !== 'sort', ARRAY_FILTER_USE_BOTH))
-        <x-ui.button :href="route('fmi.projects.index')" variant="ghost">Wyczyść</x-ui.button>
+      @if (array_filter($filters, fn ($value, $key) => $value !== '' && ! in_array($key, ['sort', 'module'], true), ARRAY_FILTER_USE_BOTH))
+        <x-ui.button :href="route('fmi.projects.index', array_filter(['module' => $module]))" variant="ghost">Wyczyść</x-ui.button>
       @endif
     </div>
 
@@ -88,8 +101,13 @@
               <th scope="col" class="hidden px-4 py-3 font-medium xl:table-cell">Autor</th>
               <th scope="col" class="px-4 py-3 font-medium">Moduły</th>
               <th scope="col" class="px-4 py-3 font-medium">Status</th>
-              <th scope="col" class="hidden px-4 py-3 font-medium md:table-cell">Podstrony</th>
-              <th scope="col" class="hidden px-4 py-3 font-medium sm:table-cell">Postęp</th>
+              @if ($isReview)
+                <th scope="col" class="hidden px-4 py-3 font-medium md:table-cell">Otwarte uwagi</th>
+                <th scope="col" class="hidden px-4 py-3 font-medium sm:table-cell">Status akceptacji</th>
+              @else
+                <th scope="col" class="hidden px-4 py-3 font-medium md:table-cell">Podstrony</th>
+                <th scope="col" class="hidden px-4 py-3 font-medium sm:table-cell">Postęp</th>
+              @endif
               <th scope="col" class="hidden px-5 py-3 font-medium lg:table-cell sm:px-6">Aktualizacja</th>
             </tr>
           </thead>
@@ -118,7 +136,7 @@
                 @endif
                 <td class="px-5 py-3 sm:px-6">
                   <p class="font-medium text-ink-950">
-                    <a href="{{ $project->homeUrl() }}" class="rounded hover:underline hover:decoration-ink-300 hover:underline-offset-2">{{ $project->name }}</a>
+                    <a href="{{ $isReview ? route('fmi.design-review.show', $project) : ($module === 'content' ? route('fmi.projects.show', $project) : $project->homeUrl()) }}" class="rounded hover:underline hover:decoration-ink-300 hover:underline-offset-2">{{ $project->name }}</a>
                   </p>
                   <p class="mt-0.5 truncate text-xs text-ink-500">{{ $project->client_name ?: 'Bez nazwy klienta' }}</p>
                   <p class="mt-0.5 text-xs text-ink-500 lg:hidden">
@@ -144,6 +162,10 @@
                 <td class="px-4 py-3">
                   <x-ui.badge :variant="$project->status->badge()">{{ $project->status->label() }}</x-ui.badge>
                 </td>
+                @if ($isReview)
+                  <td class="hidden px-4 py-3 font-semibold text-ink-950 md:table-cell">{{ $review[$project->id]['open_threads'] ?? 0 }}</td>
+                  <td class="hidden px-4 py-3 sm:table-cell">@include('fillmein.design-review.partials.status', ['revision' => $review[$project->id]['revision'] ?? null])</td>
+                @else
                 <td class="hidden px-4 py-3 text-ink-700 md:table-cell">{{ $project->pages_count }}</td>
                 <td class="hidden w-40 px-4 py-3 sm:table-cell">
                   <x-ui.progress
@@ -153,6 +175,7 @@
                     :hint="$stats['total'] > 0 ? $stats['percent'] . '%' : 'Brak pól'"
                   />
                 </td>
+                @endif
                 <td class="hidden px-5 py-3 text-xs text-ink-500 lg:table-cell sm:px-6">
                   {{ $project->updated_at?->format('d.m.Y H:i') }}
                 </td>
