@@ -7,7 +7,7 @@
 <ul class="divide-y divide-ink-150 overflow-hidden rounded-2xl border border-ink-150 bg-white shadow-xs">
   @foreach ($projects as $project)
     <li>
-      <a href="{{ route('fmi.projects.show', $project) }}" class="flex items-center justify-between gap-4 px-5 py-4 transition duration-150 hover:bg-ink-50 sm:px-6">
+      <a href="{{ $project->homeUrl() }}" class="flex items-center justify-between gap-4 px-5 py-4 transition duration-150 hover:bg-ink-50 sm:px-6">
         <div class="min-w-0">
           <p class="truncate font-medium text-ink-950">{{ $project->name }}</p>
           <p class="mt-0.5 truncate text-sm text-ink-500">

@@ -1,9 +1,9 @@
 @extends('fillmein.layouts.app')
 
-@section('title', 'Treści')
+@section('title', 'Projekty')
 
 @section('content')
-  <x-ui.page-header title="Treści" description="Treści projektów klientów, do których masz dostęp.">
+  <x-ui.page-header title="Projekty" description="Wszystkie projekty, do których masz dostęp. Każdy może mieć Treści, Design Review albo oba moduły.">
     @if ($canCreate)
       <x-slot:actions>
         <x-ui.button :href="route('fmi.projects.create')">
@@ -86,6 +86,7 @@
               <th scope="col" class="px-5 py-3 font-medium sm:px-6">Projekt</th>
               <th scope="col" class="hidden px-4 py-3 font-medium lg:table-cell">Opiekun</th>
               <th scope="col" class="hidden px-4 py-3 font-medium xl:table-cell">Autor</th>
+              <th scope="col" class="px-4 py-3 font-medium">Moduły</th>
               <th scope="col" class="px-4 py-3 font-medium">Status</th>
               <th scope="col" class="hidden px-4 py-3 font-medium md:table-cell">Podstrony</th>
               <th scope="col" class="hidden px-4 py-3 font-medium sm:table-cell">Postęp</th>
@@ -117,7 +118,7 @@
                 @endif
                 <td class="px-5 py-3 sm:px-6">
                   <p class="font-medium text-ink-950">
-                    <a href="{{ route('fmi.projects.show', $project) }}" class="rounded hover:underline hover:decoration-ink-300 hover:underline-offset-2">{{ $project->name }}</a>
+                    <a href="{{ $project->homeUrl() }}" class="rounded hover:underline hover:decoration-ink-300 hover:underline-offset-2">{{ $project->name }}</a>
                   </p>
                   <p class="mt-0.5 truncate text-xs text-ink-500">{{ $project->client_name ?: 'Bez nazwy klienta' }}</p>
                   <p class="mt-0.5 text-xs text-ink-500 lg:hidden">
@@ -129,6 +130,16 @@
                 </td>
                 <td class="hidden px-4 py-3 text-ink-700 xl:table-cell">
                   {{ $author ? \App\Support\Staff::fullName($author) : 'Konto usunięte' }}
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex flex-wrap gap-1.5">
+                    @if ($project->usesModule(\App\Enums\ProjectModule::Content))
+                      <a href="{{ route('fmi.projects.show', $project) }}" class="inline-flex items-center gap-1 rounded-full border border-ink-150 bg-white px-2.5 py-0.5 text-xs font-medium text-ink-700 transition hover:border-ink-300 hover:text-ink-950">@include('fillmein.partials.icon', ['name' => 'folder', 'class' => 'size-3.5']) Treści</a>
+                    @endif
+                    @if ($project->usesModule(\App\Enums\ProjectModule::Review))
+                      <a href="{{ route('fmi.design-review.show', $project) }}" class="inline-flex items-center gap-1 rounded-full border border-fresh-200 bg-fresh-50 px-2.5 py-0.5 text-xs font-medium text-ink-800 transition hover:border-fresh-400 hover:text-ink-950">@include('fillmein.partials.icon', ['name' => 'review', 'class' => 'size-3.5']) Design Review</a>
+                    @endif
+                  </div>
                 </td>
                 <td class="px-4 py-3">
                   <x-ui.badge :variant="$project->status->badge()">{{ $project->status->label() }}</x-ui.badge>

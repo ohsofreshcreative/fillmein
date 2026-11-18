@@ -110,7 +110,7 @@ class ProjectController extends Controller
 		$project = $this->projects->create($request->validated(), Staff::current());
 
 		return redirect()
-			->route('fmi.projects.show', $project)
+			->to($project->homeUrl())
 			->with('status', 'Projekt został utworzony.');
 	}
 

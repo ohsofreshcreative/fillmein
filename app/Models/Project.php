@@ -153,6 +153,16 @@ class Project extends Model
 		return array_values(array_filter(ProjectModule::cases(), fn (ProjectModule $module) => $this->usesModule($module)));
 	}
 
+	/**
+	 * Główny ekran projektu: Treści, gdy moduł jest włączony, w przeciwnym razie Design Review.
+	 */
+	public function homeUrl(): string
+	{
+		return ! $this->usesModule(ProjectModule::Content) && $this->usesModule(ProjectModule::Review)
+			? route('fmi.design-review.show', $this)
+			: route('fmi.projects.show', $this);
+	}
+
 	public function scopeWithModule(Builder $query, ProjectModule $module): Builder
 	{
 		return $query->where($module->column(), true);

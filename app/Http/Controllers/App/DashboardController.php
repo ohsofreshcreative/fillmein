@@ -6,6 +6,7 @@ use App\Enums\ProjectStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Page;
 use App\Models\Project;
+use App\Services\ReviewService;
 use App\Support\ProjectProgress;
 use App\Support\Staff;
 use Illuminate\Contracts\View\View;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\DB;
  */
 class DashboardController extends Controller
 {
-	public function __invoke(Gate $gate): View
+	public function __invoke(Gate $gate, ReviewService $reviews): View
 	{
 		$user = Staff::current();
 
@@ -46,7 +47,10 @@ class DashboardController extends Controller
 			->limit(5)
 			->get();
 
+		$listed = $recent->merge($mine)->unique('id')->values();
+
 		return view('fillmein.dashboard', [
+			'review' => $reviews->overview($listed),
 			'user' => $user,
 			'statuses' => collect(ProjectStatus::cases())
 				->mapWithKeys(fn (ProjectStatus $status) => [$status->value => [
@@ -55,12 +59,16 @@ class DashboardController extends Controller
 				]]),
 			'recent' => $recent,
 			'mine' => $mine,
-			'progress' => ProjectProgress::forProjects($recent->merge($mine)),
+			'progress' => ProjectProgress::forProjects($listed),
 			'totals' => [
 				'projects' => $visibleIds->count(),
 				'pages' => $visibleIds->isEmpty() ? 0 : Page::query()
 					->whereIn('project_id', $visibleIds)
 					->whereNull('archived_at')
+					->count(),
+				'openThreads' => $visibleIds->isEmpty() ? 0 : DB::table('fmi_review_threads')
+					->whereIn('project_id', $visibleIds)
+					->whereIn('status', \App\Enums\ReviewThreadStatus::unresolved())
 					->count(),
 				'clientLinks' => $visibleIds->isEmpty() ? 0 : DB::table('fmi_client_accesses')
 					->whereIn('project_id', $visibleIds)

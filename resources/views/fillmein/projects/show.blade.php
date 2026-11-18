@@ -3,22 +3,7 @@
 @section('title', $project->name)
 
 @section('content')
-  <a href="{{ route('fmi.projects.index') }}" class="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-ink-500 transition hover:text-ink-950">
-    @include('fillmein.partials.icon', ['name' => 'arrow-left', 'class' => 'size-4'])
-    Treści
-  </a>
-
-  <x-ui.page-header :eyebrow="$project->client_name ?: 'Projekt'" :title="$project->name">
-    <x-slot:actions>
-      @foreach ($project->modules() as $module)
-        <x-ui.badge variant="neutral">{{ $module->label() }}</x-ui.badge>
-      @endforeach
-      <x-ui.badge :variant="$project->status->badge()">{{ $project->status->label() }}</x-ui.badge>
-      @if ($can['update'])
-        <x-ui.button :href="route('fmi.projects.edit', $project)" variant="secondary" size="sm">Ustawienia</x-ui.button>
-      @endif
-    </x-slot:actions>
-  </x-ui.page-header>
+  @include('fillmein.projects.partials.tabs', ['project' => $project, 'current' => 'content'])
 
   <div class="mt-8 grid items-start gap-6 lg:grid-cols-3">
     {{-- Lewa kolumna: struktura i podstrony --}}

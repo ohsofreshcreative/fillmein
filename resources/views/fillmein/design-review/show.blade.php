@@ -6,24 +6,7 @@
   @php
     $latest = $overview['revision'];
   @endphp
-  <a href="{{ route('fmi.design-review.index') }}" class="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-ink-500 transition hover:text-ink-950">
-    @include('fillmein.partials.icon', ['name' => 'arrow-left', 'class' => 'size-4'])
-    Projekty
-  </a>
-
-  <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-    <div class="min-w-0">
-      <p class="mb-1 text-sm font-medium break-words text-ink-500">{{ $project->client_name ?: 'Design Review' }}</p>
-      <h1 class="text-2xl font-semibold tracking-tighter break-words">{{ $project->name }}</h1>
-    </div>
-    <div class="flex shrink-0 flex-wrap items-center gap-2">
-      @if ($project->usesModule(\App\Enums\ProjectModule::Content))
-        <x-ui.button variant="ghost" size="sm" :href="route('fmi.projects.show', $project)">Treści projektu</x-ui.button>
-      @else
-        <x-ui.button variant="ghost" size="sm" :href="route('fmi.projects.show', $project)">Karta projektu</x-ui.button>
-      @endif
-    </div>
-  </header>
+  @include('fillmein.projects.partials.tabs', ['project' => $project, 'current' => 'review'])
 
   <dl class="mt-8 grid gap-4 sm:grid-cols-3">
     <div class="rounded-2xl border border-ink-150 bg-white p-5">

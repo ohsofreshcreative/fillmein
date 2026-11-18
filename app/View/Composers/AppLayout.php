@@ -25,8 +25,8 @@ class AppLayout extends Composer
 			'staffRole' => $user ? Staff::roleLabel($user) : null,
 			'navigation' => array_values(array_filter([
 				['label' => 'Pulpit', 'route' => 'fmi.dashboard', 'active' => 'fmi.dashboard', 'icon' => 'home'],
-				['label' => 'Projekty', 'route' => 'fmi.design-review.index', 'active' => 'fmi.design-review.*', 'icon' => 'review'],
-				['label' => 'Treści', 'route' => 'fmi.projects.index', 'active' => 'fmi.projects.*', 'icon' => 'folder'],
+				['label' => 'Projekty', 'route' => 'fmi.projects.index', 'active' => 'fmi.projects.*', 'icon' => 'folder'],
+				['label' => 'Design Review', 'route' => 'fmi.design-review.index', 'active' => 'fmi.design-review.*', 'icon' => 'review'],
 				['label' => 'Powiadomienia', 'route' => 'fmi.notifications.index', 'active' => 'fmi.notifications.*', 'icon' => 'bell', 'count' => $user ? Notification::query()->for($user)->unread()->count() : 0],
 				Gate::allows('manage-users')
 					? ['label' => 'Użytkownicy', 'route' => 'fmi.users.index', 'active' => 'fmi.users.*', 'icon' => 'users']
