@@ -47,7 +47,7 @@
     <h2 id="totals-heading" class="sr-only">Podsumowanie</h2>
     <dl class="grid grid-cols-2 gap-3 lg:grid-cols-4">
       @foreach ($tiles as $tile)
-        <div class="group relative rounded-2xl border border-ink-150 bg-white p-5 shadow-xs transition @if ($tile['url']) hover:border-ink-300 hover:shadow-sm @endif">
+        <div @class(['relative rounded-2xl border border-ink-150 bg-white p-5 shadow-xs transition', 'hover:border-ink-300 hover:shadow-sm' => $tile['url']])>
           <div class="flex items-center justify-between">
             <dt class="text-sm text-ink-500">
               @if ($tile['url'])
@@ -72,7 +72,9 @@
       <h2 id="stats-heading" class="text-sm font-semibold text-ink-950">Projekty według statusu</h2>
       <span class="text-xs text-ink-500">bez archiwum: {{ $active->sum('total') }}</span>
     </div>
-    @php($colors = ['bg-ink-300', 'bg-info-600', 'bg-fresh-500', 'bg-warning-600', 'bg-success-600', 'bg-danger-600'])
+    @php
+      $colors = ['bg-ink-300', 'bg-info-600', 'bg-fresh-500', 'bg-warning-600', 'bg-success-600', 'bg-danger-600'];
+    @endphp
     <div class="mt-3 flex h-2.5 overflow-hidden rounded-full bg-ink-100" aria-hidden="true">
       @foreach ($active->values() as $i => $item)
         @if ($item['total'] > 0)
