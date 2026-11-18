@@ -108,10 +108,10 @@
           method="POST"
           action="{{ route('fmi.design-review.screens.store', $project) }}"
           class="flex flex-col gap-3"
-          data-loading-form
           data-subpages-form
           novalidate
-          x-data="{ rows: @js(array_map(fn ($row) => ['name' => (string) ($row['name'] ?? ''), 'url' => (string) ($row['url'] ?? '')], $rows)), add() { this.rows.push({ name: '', url: '' }); this.$nextTick(() => [...this.$el.querySelectorAll('[data-subpage-name]')].at(-1)?.focus()); }, remove(index) { this.rows.splice(index, 1); if (! this.rows.length) this.add(); } }"
+          x-data="reviewScreens({ rows: @js(array_map(fn ($row) => ['name' => (string) ($row['name'] ?? ''), 'url' => (string) ($row['url'] ?? '')], $rows)), url: @js(route('fmi.design-review.screens.store', $project)) })"
+          x-on:submit.prevent="send()"
         >
           @csrf
           <div class="hidden grid-cols-[minmax(0,14rem)_minmax(0,1fr)_2.5rem] gap-2 text-sm font-medium text-ink-800 sm:grid" aria-hidden="true">
@@ -130,6 +130,7 @@
                   <input data-subpage-url type="url" inputmode="url" maxlength="500" x-model="row.url" x-bind:name="'screens[' + index + '][url]'" placeholder="https://www.figma.com/design/…?node-id=…" class="h-10 w-full rounded-lg border border-ink-200 bg-white px-3 text-base text-ink-900 shadow-xs transition duration-150 placeholder:text-ink-400 hover:border-ink-300 focus:ring-focus">
                 </label>
                 <button type="button" data-subpage-remove x-on:click="remove(index)" x-bind:aria-label="'Usuń wiersz ' + (index + 1)" class="inline-flex h-10 items-center justify-center rounded-lg text-lg text-ink-500 transition hover:bg-ink-50 hover:text-danger-700 focus:ring-focus">×</button>
+                <p x-show="row.message" x-cloak class="text-sm sm:col-span-3" :class="{ 'text-danger-700': row.state === 'error', 'text-success-700': row.state === 'done', 'text-ink-500': ['queued', 'running', 'info'].includes(row.state) }" x-text="row.message" role="status"></p>
               </li>
             </template>
           </ol>
@@ -146,7 +147,7 @@
           <p class="text-sm text-ink-500">Link do frame'u: w Figmie zaznacz frame → prawy przycisk → „Copy link to selection”. Puste pole nazwy = nazwa frame'u z Figmy.</p>
           <div class="flex flex-wrap items-center justify-between gap-2">
             <x-ui.button type="button" variant="ghost" size="sm" data-subpage-add x-on:click="add()" x-bind:disabled="rows.length >= {{ \App\Http\Requests\StoreReviewScreenRequest::MAX_ROWS }}"><span aria-hidden="true">+</span> Dodaj podstronę</x-ui.button>
-            <x-ui.button type="submit">Zapisz podstrony</x-ui.button>
+            <x-ui.button type="submit" ::disabled="busy"><span x-text="busy ? 'Dodawanie…' : 'Zapisz podstrony'">Zapisz podstrony</span></x-ui.button>
           </div>
         </form>
 

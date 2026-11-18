@@ -8,6 +8,7 @@ import { exportScope } from './fillmein/export-scope.js';
 import { figmaEmbed } from './fillmein/figma-embed.js';
 import { figmaQueue } from './fillmein/figma-queue.js';
 import { projectSelection } from './fillmein/project-selection.js';
+import { reviewScreens } from './fillmein/review-screens.js';
 import { reviewComposer } from './fillmein/review-composer.js';
 import sortable from './fillmein/sortable.js';
 
@@ -19,6 +20,7 @@ Alpine.data('figmaEmbed', figmaEmbed);
 Alpine.data('figmaQueue', figmaQueue);
 Alpine.data('exportScope', exportScope);
 Alpine.data('reviewComposer', reviewComposer);
+Alpine.data('reviewScreens', reviewScreens);
 Alpine.data('clientField', clientField);
 Alpine.data('clientRepeater', clientRepeater);
 Alpine.data('clientWysiwyg', clientWysiwyg);

@@ -139,9 +139,30 @@ class DesignReviewController extends Controller
 	 * Podstrony recenzji (nazwa → link do frame'u). Bez rewizji powstaje szkic, więc link prototypu nie jest
 	 * wymagany. Każdy wiersz pobierany osobno: błędny link nie blokuje pozostałych, a wraca do formularza z komunikatem.
 	 */
-	public function storeScreen(StoreReviewScreenRequest $request, Project $project, ReviewScreenService $screens): RedirectResponse
+	public function storeScreen(StoreReviewScreenRequest $request, Project $project, ReviewScreenService $screens, \App\Services\FigmaFrameService $frames): RedirectResponse|JsonResponse
 	{
 		$revision = $this->reviews->revisionForScreens($project, Staff::current());
+
+		// Formularz wysyła podstrony po jednej (kolejka w przeglądarce) — każde żądanie jest krótkie, bo hosting
+		// przerywa długie żądania (503). Limit czasu chroni przed zawieszeniem na pojedynczym dużym frame'ie.
+		if ($request->expectsJson()) {
+			$frames->limitTime((float) config('fillmein.figma.request_budget_seconds', 20));
+			$row = $request->rows()[0] ?? null;
+
+			try {
+				$screen = $screens->add($project, $revision->refresh(), (string) ($row['url'] ?? ''), Staff::current(), $row['name'] ?? null);
+			} catch (InvalidArgumentException | FigmaException $e) {
+				return response()->json(['message' => $e->getMessage()], 422);
+			} finally {
+				$frames->limitTime(null);
+			}
+
+			return response()->json([
+				'name' => $screen->name,
+				'pins' => (bool) $screen->surface_confirmed,
+				'message' => 'Dodano „' . $screen->name . '”.',
+			], 201);
+		}
 		$added = [];
 		$failed = [];
 		$errors = [];
