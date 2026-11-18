@@ -62,7 +62,7 @@ class ReviewCommentService
 
 		$hasPin = isset($data['x'], $data['y']);
 
-		if ($hasPin && ! $screen?->surface_confirmed) {
+		if ($hasPin && ! \App\Services\ReviewScreenService::refreshSurface($screen)) {
 			throw ValidationException::withMessages(['x' => 'Pinezkę można postawić tylko na ekranie z potwierdzoną powierzchnią. Dodaj uwagę do ekranu bez pinezki.']);
 		}
 

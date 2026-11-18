@@ -5,7 +5,7 @@
 @extends('fillmein.layouts.client')
 
 @section('title', 'Recenzja: ' . $project->name)
-@section('container', 'mx-auto w-full max-w-6xl px-4 sm:px-6')
+@section('container', 'mx-auto w-full max-w-[110rem] px-4 sm:px-6')
 
 @section('header-meta')
   <div class="flex items-center gap-3">

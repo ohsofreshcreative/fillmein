@@ -184,6 +184,15 @@ export function reviewComposer({ draftKey, action = null, csrf = '', screens = [
       return `left: ${point.x * 100}%; top: ${point.y * 100}%; transform: translate(${tx}, ${tyAside})`;
     },
 
+    // Podgląd pobrany dopiero teraz: jeśli proporcje obrazu zgadzają się z frame'em, pinezki są dostępne od razu
+    // (serwer sprawdza to ponownie przy zapisie uwagi).
+    confirmByImage(img) {
+      const screen = this.screen;
+      if (!screen || screen.confirmed || !screen.width || !screen.height || !img.naturalWidth) return;
+      const ratio = img.naturalWidth / screen.width;
+      if (Math.abs(img.naturalHeight - screen.height * ratio) <= Math.max(2, ratio * 2)) screen.confirmed = true;
+    },
+
     // Kliknięcie obrazu: nowa pinezka (potwierdzona powierzchnia) albo uwaga do ekranu.
     pickPin(event) {
       if (this.active) { this.closeThread(); return; }
@@ -229,6 +238,8 @@ export function reviewComposer({ draftKey, action = null, csrf = '', screens = [
       this.open = true;
       this.error = '';
       this.focusLater(() => this.$refs.body);
+      // Formularz musi być widoczny tam, gdzie jest użytkownik (np. uwaga do ekranu stoi u góry długiego obrazu).
+      this.$nextTick(() => requestAnimationFrame(() => this.$refs.commentForm?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })));
     },
 
     // x-show przełącza widoczność po $nextTick, więc fokus ustawiamy w następnej klatce.

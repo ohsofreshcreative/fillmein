@@ -13,7 +13,7 @@
   $screensData = $screens->map(fn ($screen) => [
     'id' => $screen->id,
     'name' => $screen->name,
-    'confirmed' => $screen->surface_confirmed,
+    'confirmed' => \App\Services\ReviewScreenService::refreshSurface($screen),
     'width' => $screen->width,
     'height' => $screen->height,
     'image' => isset($imageUrl) ? $imageUrl($screen->id) : route('fmi.design-review.screens.image', [$project, $screen->id]),
@@ -118,7 +118,7 @@
         data-pin-surface
       >
         <template x-if="screen">
-          <img :src="screen.image" :alt="'Ekran: ' + screen.name" class="block h-auto w-full rounded-md bg-white shadow-xs select-none" draggable="false" data-screen-image>
+          <img :src="screen.image" x-on:load="confirmByImage($event.target)" :alt="'Ekran: ' + screen.name" class="block h-auto w-full rounded-md bg-white shadow-xs select-none" draggable="false" data-screen-image>
         </template>
         @if ($screens->isEmpty())
           <div class="flex min-h-48 items-center justify-center rounded-md border border-dashed border-ink-200 bg-white p-6 text-center text-sm text-ink-500" data-screens-empty-surface>
@@ -214,6 +214,7 @@
             x-show="open"
             x-cloak
             x-on:click.stop
+            x-ref="commentForm"
             x-on:submit.prevent="submit()"
             class="absolute z-30 flex w-80 max-w-[calc(100vw-3rem)] flex-col gap-3 rounded-xl border border-ink-150 bg-white p-4 text-left shadow-lg"
             :class="pin ? '' : 'top-3 left-1/2 -translate-x-1/2'"

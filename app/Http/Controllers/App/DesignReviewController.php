@@ -185,6 +185,7 @@ class DesignReviewController extends Controller
 		$preview = $model->preview();
 
 		abort_unless($preview && $frames->ensureLocal($preview), 404);
+		\App\Services\ReviewScreenService::refreshSurface($model);
 
 		return Storage::disk('fmi')->response($preview->path, null, [
 			'Content-Type' => $preview->mime_type ?: 'image/png',

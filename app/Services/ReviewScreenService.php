@@ -104,6 +104,31 @@ class ReviewScreenService
 		return $node ? ['file_key' => $link['file_key'], 'node_id' => $node] : null;
 	}
 
+	/**
+	 * Podgląd frame'u pobiera się dopiero przy wyświetleniu, więc przy dodawaniu ekranu powierzchnia bywa jeszcze
+	 * niepotwierdzona. Sprawdzamy ponownie, gdy podgląd już jest, i zapisujemy wynik.
+	 */
+	public static function refreshSurface(?\App\Models\ReviewScreen $screen): bool
+	{
+		if (! $screen) {
+			return false;
+		}
+
+		if ($screen->surface_confirmed) {
+			return true;
+		}
+
+		$frame = $screen->frame;
+
+		if ($frame && self::surfaceConfirmed($frame)) {
+			$screen->forceFill(['surface_confirmed' => true])->save();
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public static function surfaceConfirmed(FigmaFrame $frame): bool
 	{
 		$preview = $frame->previews()->where('node_id', $frame->node_id)->first();
