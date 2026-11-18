@@ -9,6 +9,9 @@
 
 @section('header-meta')
   <div class="flex items-center gap-3">
+    @if ($revision)
+      <x-ui.button type="button" variant="fresh" size="sm" x-data x-on:click="$dispatch('fmi-tour')">Samouczek</x-ui.button>
+    @endif
     @if ($guest->name)
       <span class="hidden text-sm text-ink-600 sm:inline" data-guest-name>{{ $guest->name }} <span class="text-ink-500">(gość)</span></span>
     @endif
@@ -86,6 +89,9 @@
 
     @if ($revision)
       @include('fillmein.client.partials.review-threads', ['threads' => $threads, 'revision' => $revision, 'canReply' => $canComment && $guest->name !== null])
+    @endif
+    @if ($revision)
+      @include('fillmein.client.partials.tour', ['tour' => 'review'])
     @endif
   </div>
 @endsection

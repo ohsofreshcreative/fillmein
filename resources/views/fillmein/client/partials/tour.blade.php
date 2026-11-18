@@ -1,5 +1,5 @@
 {{-- Samouczek edytora klienta (resources/js/fillmein/client-tour.js). Start: automatycznie albo zdarzenie `fmi-tour`. --}}
-<div x-data="clientTour" x-on:fmi-tour.window="start()" x-on:keydown.window="keydown($event)">
+<div x-data="clientTour({ tour: @js($tour ?? 'editor') })" x-on:fmi-tour.window="start()" x-on:keydown.window="keydown($event)">
   <template x-if="open">
     <div class="fixed inset-0 z-50" role="dialog" aria-modal="true" :aria-label="'Samouczek: ' + step.title">
       {{-- Przyciemnienie z „okienkiem” na pokazywanym elemencie (duży cień wokół ramki). --}}

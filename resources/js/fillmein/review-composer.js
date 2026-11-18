@@ -172,6 +172,8 @@ export function reviewComposer({ draftKey, action = null, csrf = '', screens = [
       const tag = event.target?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || event.target?.isContentEditable) return;
       if (event.altKey || event.ctrlKey || event.metaKey) return;
+      // Otwarty samouczek sam obsługuje strzałki.
+      if (document.querySelector('[aria-modal="true"]')) return;
       if (event.key === 'ArrowRight') { event.preventDefault(); this.step(1); }
       if (event.key === 'ArrowLeft') { event.preventDefault(); this.step(-1); }
     },

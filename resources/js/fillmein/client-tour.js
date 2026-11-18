@@ -6,10 +6,7 @@
  * - Klient może go wyłączyć („Nie pokazuj więcej”) — zapis w localStorage tego urządzenia.
  * - Kroki, których element nie istnieje lub jest niewidoczny na danej podstronie, są pomijane.
  */
-const OFF_KEY = 'fmi:tour-off';
-const SEEN_KEY = 'fmi:tour-seen';
-
-const STEPS = [
+const EDITOR_STEPS = [
   {
     title: 'Witaj!',
     text: 'Tu uzupełnisz treści do swojej strony. Pokażemy Ci w kilku krokach, jak to działa — zajmie to chwilę.',
@@ -55,6 +52,55 @@ const STEPS = [
   },
 ];
 
+
+const REVIEW_STEPS = [
+  {
+    title: 'Witaj!',
+    text: 'Tu przejrzysz projekt strony i zostawisz swoje uwagi. Pokażemy Ci w kilku krokach, jak to działa.',
+  },
+  {
+    target: '[data-guest-name-form]',
+    title: 'Jak Cię podpisać?',
+    text: 'Wpisz swoje imię, żeby zespół wiedział, od kogo są uwagi. Nie zakładamy konta.',
+  },
+  {
+    target: '[data-screen-tabs]',
+    title: 'Ekrany projektu',
+    text: 'Przełączaj ekrany tutaj albo strzałkami ← → na klawiaturze.',
+  },
+  {
+    target: '[data-pin-surface]',
+    title: 'Dodawanie uwag',
+    text: 'Kliknij w dowolne miejsce projektu, aby postawić pinezkę i opisać, co chcesz zmienić.',
+  },
+  {
+    target: '[data-pin]',
+    title: 'Pinezki',
+    text: 'Kliknij pinezkę, aby zobaczyć wątek i odpowiedzieć.',
+  },
+  {
+    target: '[data-comment-whole]',
+    title: 'Uwaga do całego ekranu',
+    text: 'Masz uwagę ogólną, bez wskazywania konkretnego miejsca? Dodaj ją tutaj.',
+  },
+  {
+    target: '#uwagi',
+    title: 'Lista uwag',
+    text: 'Tu znajdziesz wszystkie uwagi i odpowiedzi zespołu.',
+  },
+  {
+    target: '[data-decision-card]',
+    title: 'Akceptacja',
+    text: 'Gdy projekt jest gotowy, zaakceptuj go albo poproś o zmiany.',
+  },
+  {
+    title: 'Gotowe!',
+    text: 'Do recenzji wrócisz w każdej chwili przez ten sam link. Samouczek uruchomisz ponownie przyciskiem „Samouczek” u góry strony.',
+  },
+];
+
+const TOURS = { editor: EDITOR_STEPS, review: REVIEW_STEPS };
+
 const PAD = 8;
 
 function visible(el) {
@@ -75,7 +121,12 @@ function storage(kind, action, key, value) {
   return null;
 }
 
-export function clientTour() {
+export function clientTour({ tour = 'editor' } = {}) {
+  // Osobne klucze dla każdego samouczka — wyłączenie jednego nie wyłącza drugiego (edytor zachowuje stare klucze).
+  const OFF_KEY = tour === 'editor' ? 'fmi:tour-off' : `fmi:tour-off:${tour}`;
+  const SEEN_KEY = tour === 'editor' ? 'fmi:tour-seen' : `fmi:tour-seen:${tour}`;
+  const STEPS = TOURS[tour] ?? EDITOR_STEPS;
+
   return {
     open: false,
     steps: [],
