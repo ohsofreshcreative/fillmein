@@ -78,6 +78,8 @@ export function reviewComposer({ draftKey, action = null, csrf = '', screens = [
         // Obraz ekranu ładuje się po starcie, więc przewijamy jeszcze raz po jego wczytaniu.
         const restore = () => window.scrollTo({ top: restored.y, behavior: 'instant' });
         restore();
+        // Po wyrenderowaniu powierzchni (zarezerwowana wysokość obrazu) pozycja jest już właściwa.
+        this.$nextTick(() => requestAnimationFrame(restore));
         this.rootEl.querySelector('[data-screen-image]')?.addEventListener('load', restore, { once: true });
         window.addEventListener('load', restore, { once: true });
       }

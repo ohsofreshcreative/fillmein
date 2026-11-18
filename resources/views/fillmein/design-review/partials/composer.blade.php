@@ -114,6 +114,8 @@
         class="relative"
         :class="(canComment || needsName) && screen && screen.confirmed ? 'cursor-crosshair' : ((canComment || needsName) && screen ? 'cursor-pointer' : '')"
         x-on:click="pickPin($event)"
+        {{-- Miejsce na obraz rezerwujemy od razu (proporcje frame'u), żeby po przeładowaniu strona nie skakała na górę, zanim obraz się wczyta. --}}
+        :style="screen && screen.width && screen.height ? `aspect-ratio: ${screen.width} / ${screen.height}` : ''"
         :data-screen="screen ? screen.id : null"
         data-pin-surface
       >
