@@ -9,6 +9,8 @@
  * Zadania idą jedno po drugim, żeby nie przekroczyć limitów API Figmy. Każde żądanie jest krótkie: najpierw
  * struktura warstw, potem podglądy w porcjach (status `continue`) — długie żądania hosting przerywa błędem 500.
  */
+import { parsePageList } from './page-list.js';
+
 const RETRY_DELAY = 4000;
 const MAX_RETRIES = 40;
 const MAX_BATCHES = 20;
@@ -24,6 +26,9 @@ export function figmaQueue({ pending = [], urls = {}, storeUrl = '' } = {}) {
     adding: false,
     formErrors: {},
     formMessage: '',
+    bulkText: '',
+    bulkResults: [],
+    bulkBusy: false,
 
     init() {
       pending.forEach((id) => this.enqueue(id, 'fetch'));
@@ -162,6 +167,53 @@ export function figmaQueue({ pending = [], urls = {}, storeUrl = '' } = {}) {
       }
 
       return data;
+    },
+
+    // „Dodaj kilka podstron”: każda linia to osobne, krótkie żądanie (jak pojedyncze dodanie), frame'y pobierają
+    // się potem w tle w kolejce.
+    async addBulk(form) {
+      if (this.bulkBusy) return;
+      const { rows, skipped } = parsePageList(this.bulkText);
+      this.bulkResults = skipped.map((name) => ({ name, state: 'error', message: 'Brak linku do frame\'u — pominięto.' }));
+
+      if (!rows.length) {
+        if (!skipped.length) this.bulkResults = [{ name: '', state: 'error', message: 'Wklej co najmniej jedną linię: nazwa i link do frame\'u.' }];
+        return;
+      }
+
+      this.bulkBusy = true;
+      const common = new FormData(form);
+      const failed = [];
+
+      for (const row of rows) {
+        const result = { name: row.name || row.url, state: 'running', message: 'Zapisywanie…' };
+        this.bulkResults.push(result);
+        const body = new FormData();
+        body.append('_token', common.get('_token') ?? '');
+        body.append('name', row.name);
+        body.append('figma_frame_url', row.url);
+        if (common.get('parent_id')) body.append('parent_id', common.get('parent_id'));
+        if (common.get('client_can_duplicate')) body.append('client_can_duplicate', common.get('client_can_duplicate'));
+
+        try {
+          const page = await this.post(storeUrl, body);
+          this.added.push(page);
+          if (page.queued) {
+            this.urls[page.id] = { fetch: page.fetch_url, previews: page.previews_url };
+            this.enqueue(page.id, 'fetch');
+          }
+          result.state = 'done';
+          result.message = 'Dodano — frame pobiera się w tle.';
+        } catch (error) {
+          result.state = 'error';
+          result.message = Object.values(error.errors ?? {}).flat()[0] || error.message;
+          failed.push(`${row.name} ${row.url}`.trim());
+        }
+      }
+
+      // W polu zostają tylko linie, których nie udało się dodać — można je poprawić i wysłać ponownie.
+      this.bulkText = [...failed, ...skipped].join('\n');
+      this.bulkBusy = false;
     },
 
     async addPage(form) {

@@ -1,3 +1,5 @@
+import { parsePageList } from './page-list.js';
+
 /**
  * Dodawanie podstron do Design Review kolejką: każda podstrona to osobne, krótkie żądanie (hosting przerywa
  * długie żądania błędem 503). Wiersze z błędem zostają w formularzu z komunikatem, udane znikają.
@@ -6,7 +8,24 @@ export function reviewScreens({ rows = [], url = '' } = {}) {
   return {
     rows: rows.map((row) => ({ ...row, state: '', message: '' })),
     busy: false,
+    paste: '',
+    pasteNote: '',
     done: 0,
+
+    // Wklejona lista „nazwa link” trafia do wierszy formularza (puste wiersze są zastępowane).
+    importPaste() {
+      const { rows, skipped } = parsePageList(this.paste);
+      if (!rows.length) {
+        this.pasteNote = 'Nie znaleziono linków do frame\'ów — wklej linie w formacie „nazwa link”.';
+        return;
+      }
+      this.rows = [
+        ...this.rows.filter((row) => row.url.trim() !== '' || row.name.trim() !== ''),
+        ...rows.map((row) => ({ ...row, state: '', message: '' })),
+      ];
+      this.paste = '';
+      this.pasteNote = `Dodano do listy: ${rows.length}.` + (skipped.length ? ` Bez linku (pominięte): ${skipped.join(', ')}.` : '') + ' Kliknij „Zapisz podstrony”.';
+    },
 
     add() {
       this.rows.push({ name: '', url: '', state: '', message: '' });

@@ -139,6 +139,34 @@
                 </div>
               </form>
             </details>
+
+            {{-- Kilka podstron naraz: wklejona lista „nazwa link” (figmaQueue.addBulk). --}}
+            <details class="mt-3 rounded-xl border border-ink-150 bg-ink-50 px-4 py-3" data-page-bulk>
+              <summary class="cursor-pointer text-sm font-medium text-ink-800">Dodaj kilka podstron naraz</summary>
+              <form method="POST" action="{{ route('fmi.projects.pages.store', $project) }}" class="mt-4 flex flex-col gap-4" x-on:submit.prevent="addBulk($el)">
+                @csrf
+                <div class="flex flex-col gap-1.5">
+                  <label for="pages-bulk" class="text-sm font-medium text-ink-900">Lista podstron</label>
+                  <textarea id="pages-bulk" x-model="bulkText" rows="6" class="rounded-lg border border-ink-200 bg-white px-3 py-2 font-mono text-sm text-ink-950 shadow-xs focus:ring-focus" placeholder="Strona główna   https://www.figma.com/design/…?node-id=1-2&#10;Oferta   https://www.figma.com/design/…?node-id=3-4"></textarea>
+                  <p class="text-sm text-ink-500">Każda podstrona w osobnej linii: nazwa, a po niej link do frame'u (albo nazwa w jednej linii i link w następnej).</p>
+                </div>
+                <x-ui.select name="parent_id" id="pages-bulk-parent" label="Dodaj jako podstrony do" :options="$pageOptions" placeholder="— poziom główny —" hint="Np. wybierz „Oferta”, żeby dodać jej podstrony. Nowo dodane podstrony pojawią się tu po odświeżeniu strony." />
+                <x-ui.checkbox name="client_can_duplicate" id="pages-bulk-duplicate" label="Klient może duplikować te podstrony" />
+
+                <ul x-show="bulkResults.length > 0" x-cloak class="flex flex-col gap-1 text-sm" role="status" data-page-bulk-results>
+                  <template x-for="(item, index) in bulkResults" :key="index">
+                    <li>
+                      <span class="font-medium text-ink-900" x-text="item.name"></span>
+                      <span :class="{ 'text-success-800': item.state === 'done', 'text-danger-700': item.state === 'error', 'text-ink-500': item.state === 'running' }" x-text="' — ' + item.message"></span>
+                    </li>
+                  </template>
+                </ul>
+
+                <div class="flex justify-end">
+                  <x-ui.button type="submit" x-bind:disabled="bulkBusy"><span x-text="bulkBusy ? 'Dodawanie…' : 'Dodaj podstrony'">Dodaj podstrony</span></x-ui.button>
+                </div>
+              </form>
+            </details>
           @endif
 
           @if ($archivedPages->isNotEmpty())

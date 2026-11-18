@@ -144,6 +144,16 @@
               @endforeach
             </ul>
           @endif
+          <details class="rounded-xl border border-ink-150 bg-ink-50 px-4 py-3" data-subpages-paste>
+            <summary class="cursor-pointer text-sm font-medium text-ink-800">Wklej listę podstron</summary>
+            <div class="mt-3 flex flex-col gap-2">
+              <label for="review-paste" class="sr-only">Lista podstron</label>
+              <textarea id="review-paste" x-model="paste" rows="5" class="rounded-lg border border-ink-200 bg-white px-3 py-2 font-mono text-sm text-ink-950 shadow-xs focus:ring-focus" placeholder="Strona główna   https://www.figma.com/design/…?node-id=1-2&#10;Oferta   https://www.figma.com/design/…?node-id=3-4"></textarea>
+              <p class="text-sm text-ink-500">Każda podstrona w osobnej linii: nazwa, a po niej link (albo nazwa w jednej linii i link w następnej).</p>
+              <p x-show="pasteNote" x-cloak class="text-sm text-ink-700" role="status" x-text="pasteNote"></p>
+              <div><x-ui.button type="button" variant="secondary" size="sm" x-on:click="importPaste()">Wstaw do listy</x-ui.button></div>
+            </div>
+          </details>
           <p class="text-sm text-ink-500">Link do frame'u: w Figmie zaznacz frame → prawy przycisk → „Copy link to selection”. Puste pole nazwy = nazwa frame'u z Figmy.</p>
           <div class="flex flex-wrap items-center justify-between gap-2">
             <x-ui.button type="button" variant="ghost" size="sm" data-subpage-add x-on:click="add()" x-bind:disabled="rows.length >= {{ \App\Http\Requests\StoreReviewScreenRequest::MAX_ROWS }}"><span aria-hidden="true">+</span> Dodaj podstronę</x-ui.button>
