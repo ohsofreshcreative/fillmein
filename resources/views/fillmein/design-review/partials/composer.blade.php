@@ -18,6 +18,8 @@
     'height' => $screen->height,
     'image' => isset($imageUrl) ? $imageUrl($screen->id) : route('fmi.design-review.screens.image', [$project, $screen->id]),
   ])->values();
+  // Wzór adresu odpowiedzi dla uwagi dodanej bez przeładowania strony (ID wątku podstawia JS).
+  $replyTemplate = $canComment ? $replyUrl((object) ['id' => '__THREAD__']) : null;
   $threadsData = $threads->map(fn ($thread) => [
     'number' => $thread->number,
     'screen_id' => $thread->screen_id,
@@ -36,7 +38,7 @@
   ])->values();
 @endphp
 <div
-  x-data="reviewComposer({ draftKey: @js('fmi-review-draft:' . $project->id . ':' . $revision->id), action: @js($canComment ? ($commentUrl ?? route('fmi.design-review.comments.store', $project)) : null), csrf: @js(csrf_token()), screens: @js($screensData), threads: @js($threadsData), canComment: @js($canComment), needsName: @js($needsName ?? false) })"
+  x-data="reviewComposer({ draftKey: @js('fmi-review-draft:' . $project->id . ':' . $revision->id), action: @js($canComment ? ($commentUrl ?? route('fmi.design-review.comments.store', $project)) : null), csrf: @js(csrf_token()), screens: @js($screensData), threads: @js($threadsData), canComment: @js($canComment), needsName: @js($needsName ?? false), replyTemplate: @js($replyTemplate) })"
   x-on:keydown.escape="onEscape()"
   x-on:keydown.window="onKey($event)"
   class="flex flex-col gap-4"

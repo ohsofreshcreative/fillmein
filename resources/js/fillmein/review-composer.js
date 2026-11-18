@@ -14,7 +14,7 @@ const POPOVER_WIDTH = 332; // w-80 + odstęp od pinezki
 // Pozycja przewinięcia przed przeładowaniem po zapisie — po powrocie strona zostaje w tym samym miejscu.
 const SCROLL_KEY = 'fmi-review-scroll';
 
-export function reviewComposer({ draftKey, action = null, csrf = '', screens = [], threads = [], canComment = true, needsName = false }) {
+export function reviewComposer({ draftKey, action = null, csrf = '', screens = [], threads = [], canComment = true, needsName = false, replyTemplate = null }) {
   return {
     action,
     csrf,
@@ -367,6 +367,9 @@ export function reviewComposer({ draftKey, action = null, csrf = '', screens = [
           return;
         }
         const json = await response.json().catch(() => ({}));
+        const body = this.body;
+        const pin = this.pin && this.screen?.confirmed ? { ...this.pin } : null;
+        const screenId = this.screen?.id ?? null;
         this.requestId = null;
         this.body = '';
         this.context = '';
@@ -374,8 +377,23 @@ export function reviewComposer({ draftKey, action = null, csrf = '', screens = [
         this.cancel();
         this.notice = 'Zapisano uwagę.';
         this.$dispatch('review-comment-saved', { number: json.number ?? null, pin: Boolean(json.pin) });
-        // Po dodaniu uwagi dymek się zamyka — na ekranie zostaje sama pinezka (?nowa= zamiast ?uwaga=).
-        this.reload(json.number ?? null, { open: false });
+        // Bez przeładowania strony: pinezka pojawia się od razu, obraz zostaje na miejscu.
+        // Gdy odpowiedź nie ma danych wątku (starszy serwer), wracamy do przeładowania.
+        if (!json.number || !json.id) {
+          this.reload(json.number ?? null, { open: false });
+          return;
+        }
+        this.threads.push({
+          number: json.number,
+          screen_id: screenId,
+          pin: json.pin ? pin : null,
+          status: json.status ?? 'open',
+          status_label: json.status_label ?? '',
+          version: json.version ?? 0,
+          reply_url: replyTemplate ? replyTemplate.replace('__THREAD__', String(json.id)) : null,
+          status_url: null,
+          comments: [{ author: json.author ?? '', guest: false, time: json.time ?? '', body }],
+        });
       } catch {
         this.error = 'Brak połączenia — uwaga nie została zapisana. Szkic jest zachowany.';
       } finally {

@@ -132,7 +132,7 @@ class DesignReviewController extends Controller
 	{
 		$thread = $comments->create($project, $request->validated(), Staff::current());
 
-		return response()->json(['number' => $thread->number, 'pin' => $thread->hasPin()], 201);
+		return response()->json(['number' => $thread->number, 'pin' => $thread->hasPin(), 'id' => $thread->id, 'status' => $thread->status->value, 'status_label' => $thread->status->label(), 'version' => $thread->lock_version, 'author' => $thread->comments()->oldest()->first()?->authorName(), 'time' => $thread->created_at?->format('d.m.Y H:i')], 201);
 	}
 
 	/**
