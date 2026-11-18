@@ -197,7 +197,7 @@
                 <textarea :id="`popover-reply-${thread.number}`" x-model="reply" :maxlength="bodyMax" rows="2" placeholder="Odpowiedz…" class="rounded-lg border border-ink-200 bg-white px-3 py-2 text-sm text-ink-950 outline-none focus-visible:border-ink-950 focus-visible:ring-2 focus-visible:ring-fresh-500"></textarea>
                 <p x-show="replyError" class="text-sm text-danger-800" role="alert" x-text="replyError"></p>
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                  <a :href="`#uwaga-${thread.number}`" class="text-xs font-medium text-ink-600 underline underline-offset-2 outline-none hover:text-ink-950 focus-visible:ring-2 focus-visible:ring-fresh-500">Pokaż na liście</a>
+                  <a :href="`#uwaga-${thread.number}`" x-on:click.prevent="showOnList(thread.number)" class="text-xs font-medium text-ink-600 underline underline-offset-2 outline-none hover:text-ink-950 focus-visible:ring-2 focus-visible:ring-fresh-500">Pokaż na liście</a>
                   <div class="flex gap-2">
                     <x-ui.button type="button" variant="secondary" size="sm" x-show="thread.status_url" x-on:click="resolve()" ::disabled="replySaving" data-popover-resolve>Rozwiąż</x-ui.button>
                     <x-ui.button type="submit" size="sm" ::disabled="replySaving">Odpowiedz</x-ui.button>
@@ -205,7 +205,7 @@
                 </div>
               </form>
               <div x-show="!thread.reply_url" class="flex flex-wrap items-center justify-between gap-2">
-                <a :href="`#uwaga-${thread.number}`" class="text-xs font-medium text-ink-600 underline underline-offset-2 outline-none hover:text-ink-950 focus-visible:ring-2 focus-visible:ring-fresh-500">Pokaż na liście</a>
+                <a :href="`#uwaga-${thread.number}`" x-on:click.prevent="showOnList(thread.number)" class="text-xs font-medium text-ink-600 underline underline-offset-2 outline-none hover:text-ink-950 focus-visible:ring-2 focus-visible:ring-fresh-500">Pokaż na liście</a>
                 <p x-show="thread.status === 'resolved'" class="text-xs text-ink-500">Uwaga rozwiązana.</p>
               </div>
             </div>

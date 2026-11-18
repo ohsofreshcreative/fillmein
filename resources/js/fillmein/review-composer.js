@@ -89,6 +89,17 @@ export function reviewComposer({ draftKey, action = null, csrf = '', screens = [
         this.$nextTick(() => this.openThread(focused.number, { scroll: !keep }));
       }
 
+      const listed = params.get('lista');
+      if (listed) {
+        const clean = new URL(window.location.href);
+        clean.searchParams.delete('lista');
+        history.replaceState(null, '', clean.toString() + `#uwaga-${listed}`);
+        const glide = () => document.getElementById(`uwaga-${listed}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Najpierw wracamy tam, gdzie był użytkownik, potem płynnie zjeżdżamy do wpisu.
+        if (document.readyState === 'complete') setTimeout(glide, 150);
+        else window.addEventListener('load', () => setTimeout(glide, 150), { once: true });
+      }
+
       this.$watch('body', () => this.persist());
       this.$watch('context', () => this.persist());
     },
@@ -282,6 +293,30 @@ export function reviewComposer({ draftKey, action = null, csrf = '', screens = [
         if (scroll) pin?.scrollIntoView({ block: 'center' });
         this.$refs.threadPopover?.focus({ preventScroll: true });
       });
+    },
+
+    // Uwaga dodana bez przeładowania nie ma jeszcze wpisu na liście pod projektem — wtedy wczytujemy stronę od nowa
+    // od razu przy tym wpisie.
+    showOnList(number) {
+      const item = document.getElementById(`uwaga-${number}`);
+      if (item) {
+        item.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.replaceState(null, '', `#uwaga-${number}`);
+        return;
+      }
+      const url = new URL(window.location.href);
+      url.searchParams.delete('uwaga');
+      url.searchParams.delete('nowa');
+      if (this.screen) url.searchParams.set('ekran', String(this.screen.id));
+      // Bez kotwicy (#), bo przeglądarka skacze do niej natychmiast — po wczytaniu przewijamy płynnie (?lista=).
+      url.hash = '';
+      url.searchParams.set('lista', String(number));
+      try {
+        sessionStorage.setItem(SCROLL_KEY, JSON.stringify({ path: window.location.pathname, y: window.scrollY }));
+      } catch {
+        // bez sessionStorage strona zacznie od góry
+      }
+      window.location.replace(url.toString());
     },
 
     closeThread() {
