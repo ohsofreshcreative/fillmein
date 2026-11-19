@@ -23,6 +23,9 @@ class FigmaConnection
 
 	private const REFRESH_LOCK = 'fmi_figma_refresh';
 
+	/** Token ostatnio wydany w tym procesie — po odrzuceniu wiemy, czy w bazie jest już nowszy. */
+	private ?string $lastToken = null;
+
 	public function __construct(private HttpFactory $http)
 	{
 	}
@@ -133,7 +136,7 @@ class FigmaConnection
 		}
 
 		if (! $this->expiring($data)) {
-			return $data['access_token'];
+			return $this->lastToken = $data['access_token'];
 		}
 
 		DB::scalar('SELECT GET_LOCK(?, 10)', [self::REFRESH_LOCK]);
@@ -144,7 +147,29 @@ class FigmaConnection
 			wp_cache_delete('alloptions', 'options');
 			$data = $this->read() ?? [];
 
-			return $this->expiring($data) ? $this->refresh($data) : ($data['access_token'] ?? null);
+			return $this->lastToken = $this->expiring($data) ? $this->refresh($data) : ($data['access_token'] ?? null);
+		} finally {
+			DB::scalar('SELECT RELEASE_LOCK(?)', [self::REFRESH_LOCK]);
+		}
+	}
+
+	/**
+	 * Po odrzuceniu tokenu przez Figmę: jeśli w międzyczasie zapisano nowy token, wystarczy go użyć;
+	 * w przeciwnym razie wymuszamy odświeżenie (pod tą samą blokadą co zwykłe odświeżanie).
+	 */
+	public function renewToken(): void
+	{
+		DB::scalar('SELECT GET_LOCK(?, 10)', [self::REFRESH_LOCK]);
+
+		try {
+			$before = $this->lastToken;
+			wp_cache_delete(self::OPTION, 'options');
+			wp_cache_delete('alloptions', 'options');
+			$data = $this->read() ?? [];
+
+			if (($data['access_token'] ?? '') !== '' && $data['access_token'] === $before && ($data['refresh_token'] ?? '') !== '') {
+				$this->refresh($data);
+			}
 		} finally {
 			DB::scalar('SELECT RELEASE_LOCK(?)', [self::REFRESH_LOCK]);
 		}

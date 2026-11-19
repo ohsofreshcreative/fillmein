@@ -162,11 +162,9 @@ class FigmaClient
 		}
 
 		$maxBytes = (int) config('fillmein.figma.max_response_kb', 30 * 1024) * 1024;
-		$headers = $this->authorization();
-
 		$response = $this->send(fn () => $this->http
 			->baseUrl((string) config('fillmein.figma.api_url', 'https://api.figma.com/v1/'))
-			->withHeaders($headers)
+			->withHeaders($this->authorization())
 			->acceptJson()
 			->withoutRedirecting()
 			->timeout($this->attemptTimeout())
@@ -212,6 +210,7 @@ class FigmaClient
 		$maxAttempts = max(1, (int) config('fillmein.figma.max_attempts', 3));
 		$maxRetryAfter = (float) config('fillmein.figma.max_retry_after', 10);
 		$attempt = 0;
+		$tokenRetried = false;
 
 		while (true) {
 			$attempt++;
@@ -245,6 +244,17 @@ class FigmaClient
 
 			if ($status >= 200 && $status < 300) {
 				return $response;
+			}
+
+			// Token OAuth unieważniony w trakcie (odświeżenie w innym żądaniu kolejki, ponowne połączenie):
+			// jednorazowo pobieramy świeży token — w razie potrzeby wymuszając odświeżenie — i powtarzamy żądanie.
+			if (! $tokenRetried && $this->token === null && $this->connection !== null
+				&& ($status === 401 || ($status === 403 && str_contains($response->body(), 'Invalid token')))) {
+				$tokenRetried = true;
+				$this->connection->renewToken();
+				$attempt--;
+
+				continue;
 			}
 
 			$retryable = $status === 429 || $status >= 500;
