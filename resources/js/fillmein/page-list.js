@@ -1,8 +1,9 @@
 /**
  * Lista podstron wklejona jako tekst: „nazwa link” w jednej linii (spacje, tabulator, myślnik między nimi)
  * albo nazwa w jednej linii, a link w następnej. Linie bez linku i bez nazwy są pomijane.
+ * Gwiazdka przy nazwie („* Produkt” albo „Produkt *”) oznacza podstronę, którą klient może duplikować.
  *
- * @returns {{ rows: {name: string, url: string}[], skipped: string[] }}
+ * @returns {{ rows: {name: string, url: string, duplicate: boolean}[], skipped: string[] }}
  */
 export function parsePageList(text) {
   const rows = [];
@@ -22,8 +23,10 @@ export function parsePageList(text) {
       return;
     }
 
-    const name = line.slice(0, match.index).replace(/[\s:;|–—-]+$/, '').trim() || pendingName;
-    rows.push({ name, url: match[0].replace(/[),.;]+$/, '') });
+    const label = line.slice(0, match.index).replace(/[\s:;|–—-]+$/, '').trim() || pendingName;
+    const duplicate = /^\*|\*$/.test(label);
+    const name = label.replace(/^\*+\s*|\s*\*+$/g, '').trim();
+    rows.push({ name, url: match[0].replace(/[),.;]+$/, ''), duplicate });
     pendingName = '';
   });
 

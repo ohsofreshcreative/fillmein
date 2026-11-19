@@ -133,10 +133,10 @@
                 <div class="flex flex-col gap-1.5">
                   <label for="pages-bulk" class="text-sm font-medium text-ink-900">Lista podstron</label>
                   <textarea id="pages-bulk" x-model="bulkText" rows="6" class="rounded-lg border border-ink-200 bg-white px-3 py-2 font-mono text-sm text-ink-950 shadow-xs focus:ring-focus" placeholder="Strona główna   https://www.figma.com/design/…?node-id=1-2&#10;Oferta   https://www.figma.com/design/…?node-id=3-4"></textarea>
-                  <p class="text-sm text-ink-500">Każda podstrona w osobnej linii: nazwa, a po niej link do frame'u (albo nazwa w jednej linii i link w następnej).</p>
+                  <p class="text-sm text-ink-500">Każda podstrona w osobnej linii: nazwa, a po niej link do frame'u (albo nazwa w jednej linii i link w następnej). Gwiazdka przy nazwie, np. <code class="font-mono">Pojedynczy produkt *</code>, oznacza podstronę, którą klient może duplikować.</p>
                 </div>
                 <x-ui.select name="parent_id" id="pages-bulk-parent" label="Dodaj jako podstrony do" :options="$pageOptions" placeholder="— poziom główny —" hint="Np. wybierz „Oferta”, żeby dodać jej podstrony. Nowo dodane podstrony pojawią się tu po odświeżeniu strony." />
-                <x-ui.checkbox name="client_can_duplicate" id="pages-bulk-duplicate" label="Klient może duplikować te podstrony" />
+                <x-ui.checkbox name="client_can_duplicate" id="pages-bulk-duplicate" label="Klient może duplikować wszystkie te podstrony" />
 
                 <ul x-show="bulkResults.length > 0" x-cloak class="flex flex-col gap-1 text-sm" role="status" data-page-bulk-results>
                   <template x-for="(item, index) in bulkResults" :key="index">

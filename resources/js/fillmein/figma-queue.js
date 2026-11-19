@@ -193,7 +193,7 @@ export function figmaQueue({ pending = [], urls = {}, storeUrl = '' } = {}) {
         body.append('name', row.name);
         body.append('figma_frame_url', row.url);
         if (common.get('parent_id')) body.append('parent_id', common.get('parent_id'));
-        if (common.get('client_can_duplicate')) body.append('client_can_duplicate', common.get('client_can_duplicate'));
+        if (row.duplicate || common.get('client_can_duplicate')) body.append('client_can_duplicate', '1');
 
         try {
           const page = await this.post(storeUrl, body);
