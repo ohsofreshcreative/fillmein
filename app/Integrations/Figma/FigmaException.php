@@ -39,10 +39,18 @@ final class FigmaException extends RuntimeException
 			return new self(self::FORBIDDEN, 'Token Figma API nie ma zakresu file_content:read (403). Wygeneruj token z tym zakresem.', $status, $attempts);
 		}
 
+		// Treść błędu od Figmy (pole „err”/„message”) — 403 ma kilka przyczyn (dostęp, limit, zablokowany eksport).
+		$detail = '';
+		if ($status === 403 && $body !== '') {
+			$json = json_decode($body, true);
+			$text = is_array($json) ? (string) ($json['err'] ?? $json['message'] ?? '') : '';
+			$detail = $text !== '' ? ' Figma: „' . mb_substr(strip_tags($text), 0, 200) . '”.' : '';
+		}
+
 		return match (true) {
 			$status === 400 => new self(self::BAD_REQUEST, 'Figma odrzuciła zapytanie (400). Sprawdź link do frame\'u.', $status, $attempts),
 			$status === 401 => new self(self::UNAUTHORIZED, 'Token Figma API jest nieprawidłowy lub wygasł (401).', $status, $attempts),
-			$status === 403 => new self(self::FORBIDDEN, 'Brak dostępu do tego pliku Figmy (403). Token musi należeć do konta z dostępem do pliku.', $status, $attempts),
+			$status === 403 => new self(self::FORBIDDEN, 'Brak dostępu do tego pliku Figmy (403). Token musi należeć do konta z dostępem do pliku.' . $detail, $status, $attempts),
 			$status === 404 => new self(self::NOT_FOUND, 'Nie znaleziono pliku lub frame\'u w Figmie (404).', $status, $attempts),
 			$status === 429 => new self(self::RATE_LIMITED, 'Przekroczono limit zapytań Figma API (429). Spróbuj ponownie za kilka minut.', $status, $attempts),
 			$status >= 500 => new self(self::SERVER, "Figma API jest chwilowo niedostępne ({$status}). Spróbuj ponownie później.", $status, $attempts),
